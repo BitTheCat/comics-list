@@ -1,13 +1,5 @@
--- Initial schema for comics-list
+-- Initial schema for comics-list (simplified: series + publishers + entries)
 PRAGMA foreign_keys = ON;
-
-CREATE TABLE IF NOT EXISTS works (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS publishers (
   id TEXT PRIMARY KEY,
@@ -17,13 +9,16 @@ CREATE TABLE IF NOT EXISTS publishers (
 
 CREATE TABLE IF NOT EXISTS series (
   id TEXT PRIMARY KEY,
-  work_id TEXT NOT NULL,
+  -- title is the franchise/title (e.g. "Spawn")
+  title TEXT NOT NULL,
+  -- optional human readable run title (e.g. "Spawn (Casa 1)")
+  series_title TEXT,
   publisher_id TEXT,
-  title TEXT,
   start_year INTEGER,
   end_year INTEGER,
   notes TEXT,
-  FOREIGN KEY (work_id) REFERENCES works(id),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
   FOREIGN KEY (publisher_id) REFERENCES publishers(id)
 );
 

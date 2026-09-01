@@ -32,8 +32,15 @@ export default defineComponent({
     const create = async () => {
       if (!title.value) return;
       try {
-        await invoke('api_create_work', {
-          payload: { title: title.value, description: description.value || null },
+        await invoke('api_create_series', {
+          payload: {
+            title: title.value,
+            series_title: description.value || null,
+            publisher_id: null,
+            start_year: null,
+            end_year: null,
+            notes: null,
+          },
         });
         title.value = '';
         description.value = '';

@@ -29,7 +29,7 @@ export default defineComponent({
       try {
         // call tauri command
         // @ts-ignore
-        const res = await invoke('api_list_works');
+        const res = await invoke('api_list_series');
         works.value = res;
       } catch (e) {
         console.error(e);
