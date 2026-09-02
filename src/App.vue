@@ -18,7 +18,7 @@
 import { defineComponent, ref, onMounted } from 'vue';
 import WorksList from './components/WorksList.vue';
 import EntriesList from './components/EntriesList.vue';
-import { invoke } from '@tauri-apps/api/tauri';
+import { api } from './api';
 
 export default defineComponent({
   components: { WorksList, EntriesList },
@@ -27,10 +27,8 @@ export default defineComponent({
 
     const loadWorks = async () => {
       try {
-        // call tauri command
-        // @ts-ignore
-        const res = await invoke('api_list_series');
-        works.value = res;
+        const res = await api.listSeries();
+        works.value = res as any[];
       } catch (e) {
         console.error(e);
       }

@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue';
-import { invoke } from '@tauri-apps/api/tauri';
+import { api } from '../api';
 
 export default defineComponent({
   props: {
@@ -32,15 +32,13 @@ export default defineComponent({
     const create = async () => {
       if (!title.value) return;
       try {
-        await invoke('api_create_series', {
-          payload: {
-            title: title.value,
-            series_title: description.value || null,
-            publisher_id: null,
-            start_year: null,
-            end_year: null,
-            notes: null,
-          },
+        await api.createSeries({
+          title: title.value,
+          series_title: description.value || null,
+          publisher_id: null,
+          start_year: null,
+          end_year: null,
+          notes: null,
         });
         title.value = '';
         description.value = '';
