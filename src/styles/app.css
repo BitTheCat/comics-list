@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+.text-muted {
+    color: gray;
+}
+
+@media (prefers-color-scheme: dark) {
+    .text-muted {
+        color: slategray;
+    }
+}

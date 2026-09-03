@@ -1,0 +1,11 @@
+node_modules
+dist
+target
+**/*.db
+src-tauri/target
+src-tauri/Cargo.lock
+.env
+.DS_Store
+.vscode
+*.log
+
