@@ -3,7 +3,7 @@
     <p>Select a work/series to see entries. (Placeholder)</p>
   </div>
 
-  <Table v-else v-model:items="entries" v-model:fields="fields"/>
+  <Table v-else :items="entries" :fields="fields"/>
 </template>
 
 <script lang="ts" setup>
