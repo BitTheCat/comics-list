@@ -4,7 +4,7 @@
           <button class="btn btn-sm" @click="toggle">Toggle Theme</button>
           <button class="btn  btn-sm" @click="showModal = true">Add Series</button>
       </div>
-      <Table :items="series" :fields="fields" :key="renderKey">
+      <Table :items="series" :fields="fields">
           <template #title="{ item }">
               <p>{{ item.title }}</p>
               <span class="text-muted">{{item.description ?? 'aaaaaaaaaaaa'}}</span>
@@ -46,15 +46,14 @@ const fields = ref([
   },
 ]);
 
-const renderKey = ref(1);
-
 const series = ref<any[]>([]);
 
 const loadSeries = async () => {
   try {
     const res = await api.listSeries();
-    series.value = res as any[];
-    renderKey.value++;
+    // assign a fresh array with new object references to ensure Vue reactivity
+    // picks up deep changes and child components receive a new prop reference.
+    series.value = Array.isArray(res) ? (res as any[]).map((s) => ({ ...s })) : [];
   } catch (e) {
     console.error(e);
   }
