@@ -3,43 +3,24 @@
     <h1>comics-list (Tauri + Vue)</h1>
     <div style="display:flex; gap:24px;">
       <div style="width:300px;">
-        <h2>Works</h2>
-        <WorksList @created="refreshWorks" :works="works" />
+        <h2>Series</h2>
+        <SeriesList @details="(v: string) => seriesId = v"/>
       </div>
       <div style="flex:1;">
         <h2>Entries</h2>
-        <EntriesList />
+        <EntriesList v-model:seriesId="seriesId" />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
-import WorksList from './components/WorksList.vue';
-import EntriesList from './components/EntriesList.vue';
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue';
+import SeriesList from './pages/SeriesList.vue';
+import EntriesList from './pages/EntriesList.vue';
 import { api } from './api';
 
-export default defineComponent({
-  components: { WorksList, EntriesList },
-  setup() {
-    const works = ref([]);
+const seriesId = ref<string|number|null>(null);
 
-    const loadWorks = async () => {
-      try {
-        const res = await api.listSeries();
-        works.value = res as any[];
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    onMounted(() => {
-      loadWorks();
-    });
-
-    return { works, refreshWorks: loadWorks };
-  },
-});
 </script>
 
