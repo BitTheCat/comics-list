@@ -22,5 +22,17 @@ export const api = {
     if (isTauri) return invokeTauri('api_list_entries', { seriesId });
     return mock.getEntries(seriesId);
   },
+  createEntry: (payload: any) => {
+    if (isTauri) return invokeTauri('api_create_entry', { payload });
+    return import('../mocks/api_entries').then((m) => m.createEntry(payload));
+  },
+  updateEntry: (id: string, payload: any) => {
+    if (isTauri) return invokeTauri('api_update_entry', { id, payload });
+    return import('../mocks/api_entries').then((m) => m.updateEntry(id, payload));
+  },
+  deleteEntry: (id: string) => {
+    if (isTauri) return invokeTauri('api_delete_entry', { id });
+    return import('../mocks/api_entries').then((m) => m.deleteEntry(id));
+  },
 };
 
