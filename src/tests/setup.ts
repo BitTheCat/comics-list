@@ -1,6 +1,4 @@
-import matchers from '@testing-library/jest-dom/matchers';
-import { expect } from 'vitest';
+// Test setup file for Vitest (jsdom environment)
+// Add global mocks or polyfills here if needed.
 
-// extends vitest expect with jest-dom matchers
-expect.extend(matchers);
-
+export {};

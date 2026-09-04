@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getSeries } from './api';
+import { getSeries } from '../mocks/api';
 
 describe('mock api', () => {
   it('getSeries returns an array', async () => {
