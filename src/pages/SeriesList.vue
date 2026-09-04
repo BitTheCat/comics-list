@@ -10,7 +10,7 @@
               <span class="text-muted">{{item.description ?? 'aaaaaaaaaaaa'}}</span>
           </template>
           <template #actions="{ item }">
-              <button class="btn btn-sm" @click="emit('details', item.id)">Details</button>
+              <button class="btn btn-sm" @click="viewDetails(item.id)">Details</button>
           </template>
       </Table>
   </div>
@@ -22,11 +22,9 @@ import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
 import CreateSeriesModal from '../components/CreateSeriesModal.vue';
 import { api } from '../api';
+import { useRouter } from 'vue-router';
 
-const emit = defineEmits<{
-  (e: 'created'): void;
-  (e: 'details', id: string | number): void;
-}>();
+const router = useRouter();
 
 const toggle = () => {
   const html = document.documentElement;
@@ -68,8 +66,10 @@ const refreshSeries = loadSeries;
 const onCreated = async () => {
   // refresh local list
   await refreshSeries();
-  // notify parent so it can refresh its own data if needed
-  emit('created');
+};
+
+const viewDetails = (id: string | number) => {
+  router.push({ name: 'series-detail', params: { id } });
 };
 
 </script>

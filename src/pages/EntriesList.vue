@@ -1,6 +1,9 @@
 <template>
-    <button class="btn btn-sm" @click="showModal = true">Add number</button>
-    <div v-if="!props.seriesId">
+    <div class="flex gap-2">
+        <RouterLink class="btn btn-sm" to="/series">Back to series</RouterLink>
+        <button class="btn btn-sm" @click="showModal = true">Add number</button>
+    </div>
+    <div v-if="!props.id">
         <p>Select a work/series to see entries. (Placeholder)</p>
     </div>
 
@@ -9,7 +12,7 @@
             <button class="btn btn-sm" @click="deleteElement(item.id)">Delete</button>
         </template>
     </Table>
-    <CreateEntryModal v-if="seriesId" v-model="showModal" :series_id="props.seriesId" @created="onCreated" />
+    <CreateEntryModal v-if="props.id" v-model="showModal" :series_id="props.id" @created="onCreated" />
 </template>
 
 <script lang="ts" setup>
@@ -17,12 +20,11 @@ import { ref, watch } from "vue";
 import { api } from "../api";
 import Table from "../components/Table.vue";
 import CreateEntryModal from "../components/CreateEntryModal.vue";
-import { deleteEntry } from "../mocks/api_entries";
 
 // No script logic yet; kept as <script setup> for consistency
 
 const props = defineProps({
-    seriesId: {
+    id: {
         type: String,
         default: null,
     },
@@ -45,7 +47,7 @@ const fields = ref<any[]>([
 const entries = ref<any[]>([]);
 
 const fetchEntries = async () => {
-    const res = await api.getEntries(props.seriesId);
+    const res = await api.getEntries(props.id);
     entries.value = res;
 };
 
@@ -59,9 +61,9 @@ const onCreated = async () => {
 };
 
 const deleteElement = async (id: string) => {
-    await deleteEntry(id);
+    await api.deleteEntry(id);
     refreshEntries();
 };
 
-watch(() => props.seriesId, fetchEntries);
+watch(() => props.id, fetchEntries, { immediate: true });
 </script>
