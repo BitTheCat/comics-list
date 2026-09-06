@@ -18,11 +18,11 @@
             </div>
         </template>
     </Table>
-    <EntryModal v-if="props.id" v-model="showModal" :entry="editItem" :series_id="props.id" @created="onCreated" />
+    <EntryModal v-if="seriesId" v-model="showModal" :entry="editItem" :series_id="seriesId" @created="onCreated" />
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { api } from "../api";
 import Table from "../components/Table.vue";
 import EntryModal from "../components/EntryModal.vue";
@@ -39,6 +39,8 @@ const props = defineProps({
         default: null,
     },
 });
+
+const seriesId = computed(() => Number(props.id));
 
 const emit = defineEmits<{
   (e: 'created'): void;
@@ -71,7 +73,7 @@ const formatMonth = (month: number | null): string => {
 };
 
 const fetchEntries = async () => {
-    const res = await api.getEntries(props.id);
+    const res = await api.getEntries(seriesId.value);
     entries.value = res;
 };
 

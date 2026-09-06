@@ -27,7 +27,7 @@ describe('SeriesModal', () => {
 
   it('opens in edit mode', () => {
     const series: Series = {
-      id: '1',
+      id: 1,
       title: 'Test',
       description: 'Test Description',
       publisher_id: '1',

@@ -91,7 +91,7 @@ const emit = defineEmits<{
 }>();
 
 interface Form {
-  id?: string;
+  id?: number;
   title: string;
   description: string;
   publisher_name: string | null;

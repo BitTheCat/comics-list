@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS publishers (
 );
 
 CREATE TABLE IF NOT EXISTS series (
-  id TEXT PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   -- title is the franchise/title (e.g. "Spawn")
   title TEXT NOT NULL,
   description TEXT,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS series (
 
 CREATE TABLE IF NOT EXISTS entries (
   id TEXT PRIMARY KEY,
-  series_id TEXT NOT NULL,
+  series_id INTEGER NOT NULL,
   issue_number TEXT NOT NULL,
   volume TEXT,
   title TEXT,

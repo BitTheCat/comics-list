@@ -6,7 +6,6 @@ use chrono::Utc;
 use db::{create_series, init_db, list_series, SeriesRow};
 use serde::Deserialize;
 use tauri::Manager;
-use uuid::Uuid;
 
 #[tauri::command]
 fn api_list_series() -> Result<Vec<SeriesRow>, String> {
@@ -25,13 +24,11 @@ struct CreateSeriesPayload {
 }
 
 #[tauri::command]
-fn api_create_series(payload: CreateSeriesPayload) -> Result<String, String> {
+fn api_create_series(payload: CreateSeriesPayload) -> Result<i64, String> {
     let conn = init_db().map_err(|e| format!("db init error: {}", e))?;
-    let id = Uuid::new_v4().to_string();
     let now = Utc::now().to_rfc3339();
-    create_series(
+    let id = create_series(
         &conn,
-        &id,
         &payload.title,
         payload.description.as_deref(),
         payload.publisher_id.as_deref(),

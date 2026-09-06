@@ -8,7 +8,7 @@ describe('EntryModal', () => {
     const { getByRole } = render(EntryModal, {
       props: {
         modelValue: true,
-        series_id: '1',
+        series_id: 1,
         entry: null,
       },
     });
@@ -31,7 +31,7 @@ describe('EntryModal', () => {
       id: '1',
       issue_number: '1',
       title: 'Test',
-      series_id: '1',
+      series_id: 1,
       pub_year: 2021,
       pub_month: 1,
       cover_path: null,
@@ -41,7 +41,7 @@ describe('EntryModal', () => {
     const { getByRole, getByDisplayValue } = render(EntryModal, {
       props: {
         modelValue: true,
-        series_id: '1',
+        series_id: 1,
         entry,
       },
     });

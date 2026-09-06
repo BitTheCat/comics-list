@@ -48,7 +48,7 @@ import YearSelect from './YearSelect.vue';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
-  series_id: string;
+  series_id: number;
   entry?: Entry | null;
 }>(), {
   modelValue: false,

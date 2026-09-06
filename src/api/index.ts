@@ -14,6 +14,10 @@ export const api = {
     if (isTauri) return invokeTauri('api_list_series');
     return mock.getSeries();
   },
+  listSeriesPaginated: (request: mock.PaginationRequest = {}) => {
+    if (isTauri) return invokeTauri('api_list_series_paginated', { request });
+    return mock.getSeriesPaginated(request);
+  },
   createSeries: (p: any) => {
     if (isTauri) return invokeTauri('api_create_series', { payload: p });
     return mock.createSeries(p);
@@ -50,9 +54,18 @@ export const api = {
 
     return exactMatch ?? api.createPublisher({ name: normalizedName });
   },
-  getEntries: (seriesId: string) => {
+  getEntries: (seriesId: number) => {
     if (isTauri) return invokeTauri('api_list_entries', { seriesId });
     return mock.getEntries(seriesId);
+  },
+  listEntriesPaginated: (
+    seriesId: number,
+    request: mock.PaginationRequest = {},
+  ) => {
+    if (isTauri) {
+      return invokeTauri('api_list_entries_paginated', { seriesId, request });
+    }
+    return mock.getEntriesPaginated(seriesId, request);
   },
   createEntry: (payload: any) => {
     if (isTauri) return invokeTauri('api_create_entry', { payload });

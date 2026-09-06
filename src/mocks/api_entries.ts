@@ -9,7 +9,7 @@ export async function createEntry(payload: any) {
   return new Promise((resolve) => setTimeout(() => resolve(entry), 50));
 }
 
-export async function getEntries(seriesId: string) {
+export async function getEntries(seriesId: number) {
   const list = mockEntries.filter((e) => e.series_id === seriesId);
   return new Promise((resolve) => setTimeout(() => resolve(list), 50));
 }
