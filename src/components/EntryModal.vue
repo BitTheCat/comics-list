@@ -4,15 +4,34 @@
       <h3 class="text-lg font-bold">{{ form.id ? 'Edit' : 'Create' }} entry</h3>
 
       <form @submit.prevent="createOrUpdate">
-        <input class="input" v-model="form.issue_number" placeholder="New entry number #" />
-        <br />
-        <input class="input" v-model="form.title" placeholder="Title" />
-        <br />
-        <YearSelect v-model="form.pub_year" label="Publication year" />
-        <br />
-        <input class="input" v-model="form.pub_month" placeholder="Publication month" />
-        <br />
-        <div class="modal-action" style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+        <input
+          id="entry-issue-number"
+          v-model="form.issue_number"
+          class="input w-full"
+          name="issue_number"
+          placeholder="New entry number #"
+        />
+        <input
+          id="entry-title"
+          v-model="form.title"
+          class="input w-full"
+          name="title"
+          placeholder="Title"
+        />
+        <YearSelect
+          id="entry-publication-year"
+          v-model="form.pub_year"
+          label="Publication year"
+          name="pub_year"
+        />
+        <input
+          id="entry-publication-month"
+          v-model.number="form.pub_month"
+          class="input w-full"
+          name="pub_month"
+          placeholder="Publication month"
+        />
+        <div class="modal-action">
           <button class="btn" type="button" @click="close">Cancel</button>
           <button class="btn" type="submit">{{ form.id ? 'Update' : 'Create' }}</button>
         </div>

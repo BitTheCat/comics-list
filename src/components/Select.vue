@@ -2,6 +2,7 @@
   <label class="form-group">
     <span v-if="label" class="label">{{ label }}</span>
     <select
+      :id="id"
       v-model="model"
       class="select w-full"
       :name="name"
@@ -38,6 +39,7 @@ const props = withDefaults(defineProps<{
   options: SelectOption[];
   label?: string;
   placeholder?: string;
+  id?: string;
   name?: string;
   disabled?: boolean;
   required?: boolean;
@@ -45,6 +47,7 @@ const props = withDefaults(defineProps<{
   modelValue: null,
   label: undefined,
   placeholder: undefined,
+  id: undefined,
   name: undefined,
   disabled: false,
   required: false,

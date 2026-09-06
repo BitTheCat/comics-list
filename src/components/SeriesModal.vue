@@ -8,12 +8,20 @@
 
       <form @submit.prevent="createOrUpdate">
         <div class="form-group">
-          <input class="input" v-model="form.title" placeholder="New series title" />
+          <input
+                      id="series-title"
+                      v-model="form.title"
+                      class="input w-full"
+                      name="title"
+                      placeholder="New series title"
+                    />
         </div>
         <div class="form-group">
           <input
-            class="input"
+            id="series-publisher"
             v-model="form.publisher_name"
+            class="input w-full"
+            name="publisher_name"
             list="publisher-options"
             placeholder="Publisher"
             @input="searchPublishers"
@@ -30,17 +38,31 @@
           </p>
         </div>
         <div class="form-group">
-          <textarea class="textarea" v-model="form.description" placeholder="Description (optional)"></textarea>
+          <textarea
+                      id="series-description"
+                      v-model="form.description"
+                      class="textarea w-full"
+                      name="description"
+                      placeholder="Description (optional)"
+                    ></textarea>
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <YearSelect v-model="form.start_year" label="Start year" />
-          <YearSelect v-model="form.end_year" label="End year" />
+          <YearSelect
+            id="series-start-year"
+            v-model="form.start_year"
+            label="Start year"
+            name="start_year"
+          />
+          <YearSelect
+            id="series-end-year"
+            v-model="form.end_year"
+            label="End year"
+            name="end_year"
+          />
         </div>
-        <div class="form-group">
-          <div class="modal-action" style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-            <button class="btn" type="button" @click="close">Cancel</button>
-            <button class="btn" type="submit">{{ form.id ? 'Update' : 'Create' }}</button>
-          </div>
+        <div class="modal-action">
+          <button class="btn" type="button" @click="close">Cancel</button>
+          <button class="btn" type="submit">{{ form.id ? 'Update' : 'Create' }}</button>
         </div>
       </form>
     </div>
@@ -69,7 +91,7 @@ const emit = defineEmits<{
 }>();
 
 interface Form {
-  id: string | null;
+  id?: string;
   title: string;
   description: string;
   publisher_name: string | null;
@@ -107,12 +129,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 
 const searchPublishers = async () => {
   const sequence = ++searchSequence;
-  const publishers = await api.listPublishers(form.value.publisher_name) as Publisher[];
+  const publishers = await api.listPublishers(
+    form.value.publisher_name ? form.value.publisher_name : ''
+  ) as Publisher[];
   if (sequence === searchSequence) publisherSuggestions.value = publishers;
 };
 
 const create = async () => {
-  if (!form.value.title.trim() || !form.value.publisher_name.trim()) return;
+  if (!form.value.title.trim() || !form.value.publisher_name?.trim()) return;
   try {
     const publisher = await api.findOrCreatePublisher(form.value.publisher_name) as Publisher;
     await api.createSeries({
@@ -128,7 +152,7 @@ const create = async () => {
 };
 
 const update = async () => {
-  if (!form.value.title.trim() || !form.value.publisher_name.trim()) return;
+  if (!form.value.title.trim() || !form.value.publisher_name?.trim()) return;
   try {
     const publisher = await api.findOrCreatePublisher(form.value.publisher_name) as Publisher;
     await api.updateSeries({

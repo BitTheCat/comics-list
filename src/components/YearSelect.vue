@@ -3,6 +3,7 @@
     v-model="model"
     :label="label"
     :placeholder="placeholder"
+    :id="id"
     :name="name"
     :disabled="disabled"
     :required="required"
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<{
   modelValue?: number | null;
   label?: string;
   placeholder?: string;
+  id?: string;
   name?: string;
   minYear?: number;
   maxYear?: number;
@@ -27,6 +29,7 @@ const props = withDefaults(defineProps<{
   modelValue: null,
   label: undefined,
   placeholder: 'Not specified',
+  id: undefined,
   name: undefined,
   minYear: 1950,
   maxYear: () => new Date().getFullYear() + 1,
