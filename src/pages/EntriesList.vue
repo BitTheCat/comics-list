@@ -13,21 +13,22 @@
         </template>
         <template #actions="{ item }">
             <div class="flex gap-2">
-                <EditButton />
+                <EditButton @click="openEdit(item)" />
                 <DeleteButton @click="deleteElement(item.id)"/>
             </div>
         </template>
     </Table>
-    <CreateEntryModal v-if="props.id" v-model="showModal" :series_id="props.id" @created="onCreated" />
+    <EntryModal v-if="props.id" v-model="showModal" :entry="editItem" :series_id="props.id" @created="onCreated" />
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { api } from "../api";
 import Table from "../components/Table.vue";
-import CreateEntryModal from "../components/CreateEntryModal.vue";
+import EntryModal from "../components/EntryModal.vue";
 import EditButton from "../components/EditButton.vue";
 import DeleteButton from "../components/DeleteButton.vue";
+import { Entry } from "../types";
 
 
 // No script logic yet; kept as <script setup> for consistency
@@ -44,6 +45,12 @@ const emit = defineEmits<{
 }>();
 
 const showModal = ref(false);
+const editItem = ref<Entry>(null);
+
+const openEdit = (item: Entry) => {
+    editItem.value = item;
+    showModal.value = true;
+};
 
 const fields = ref<any[]>([
     { key: "issue_number", label: "Issue Number" },
@@ -53,7 +60,7 @@ const fields = ref<any[]>([
     { key: "actions", label: "" },
 ]);
 
-const entries = ref<any[]>([]);
+const entries = ref<Entry[]>([]);
 
 const monthFormatter = new Intl.DateTimeFormat("it-IT", { month: "long" });
 

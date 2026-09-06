@@ -77,8 +77,8 @@ onMounted(() => {
 });
 
 const openEdit = (series: any) => {
-  showModal.value = true;
   editItem.value = series;
+  showModal.value = true;
 };
 
 const deleteSeries = async (id: string | number) => {

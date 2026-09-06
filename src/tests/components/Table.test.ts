@@ -1,6 +1,6 @@
 import { render } from '@testing-library/vue';
 import { describe, expect, it } from 'vitest';
-import Table from './Table.vue';
+import Table from '../../components/Table.vue';
 
 describe('Table', () => {
   it('renders headers and rows from its props', () => {

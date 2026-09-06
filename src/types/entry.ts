@@ -7,5 +7,4 @@ export interface Entry {
   pub_month: number | null;
   cover_path: string | null;
   tags: string[];
-    
 }
