@@ -41,8 +41,12 @@ export const mockEntries = [
 ];
 
 export async function getSeries() {
-  // simulate async
-  return new Promise(resolve => setTimeout(() => resolve(mockSeries), 100));
+  const series = mockSeries.map((item) => ({
+    ...item,
+    entries_count: mockEntries.filter((entry) => entry.series_id === item.id).length,
+  }));
+
+  return new Promise(resolve => setTimeout(() => resolve(series), 100));
 }
 
 export async function getEntries(seriesId: string) {

@@ -13,6 +13,18 @@ describe('mock api', () => {
     expect(Array.isArray(s)).toBe(true);
   });
 
+  it('returns the entries count without embedding the entries', async () => {
+    const series = await getSeries() as Array<{
+      id: string;
+      entries_count: number;
+      entries?: unknown[];
+    }>;
+
+    expect(series.find((item) => item.id === 's1')?.entries_count).toBe(2);
+    expect(series.find((item) => item.id === 's2')?.entries_count).toBe(1);
+    expect(series.every((item) => item.entries === undefined)).toBe(true);
+  });
+
   it('searches publishers without considering case', async () => {
     const publishers = await getPublishers('panini');
 

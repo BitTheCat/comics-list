@@ -64,10 +64,29 @@ pub struct SeriesRow {
     pub notes: Option<String>,
     pub created_at: String,
     pub updated_at: String,
+    pub entries_count: i64,
 }
 
 pub fn list_series(conn: &Connection) -> Result<Vec<SeriesRow>> {
-    let mut stmt = conn.prepare("SELECT id, title, description, publisher_id, start_year, end_year, notes, created_at, updated_at FROM series ORDER BY title COLLATE NOCASE")?;
+    let mut stmt = conn.prepare(
+        "SELECT
+            s.id,
+            s.title,
+            s.description,
+            s.publisher_id,
+            s.start_year,
+            s.end_year,
+            s.notes,
+            s.created_at,
+            s.updated_at,
+            (
+                SELECT COUNT(*)
+                FROM entries e
+                WHERE e.series_id = s.id
+            ) AS entries_count
+        FROM series s
+        ORDER BY s.title COLLATE NOCASE",
+    )?;
     let rows = stmt.query_map([], |r| {
         Ok(SeriesRow {
             id: r.get(0)?,
@@ -79,6 +98,7 @@ pub fn list_series(conn: &Connection) -> Result<Vec<SeriesRow>> {
             notes: r.get(6).ok(),
             created_at: r.get(7)?,
             updated_at: r.get(8)?,
+            entries_count: r.get(9)?,
         })
     })?;
 

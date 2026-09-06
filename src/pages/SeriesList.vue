@@ -43,8 +43,8 @@ const fields = ref([
     label: 'Publisher',
   },
   {
-    key: '',
-    label: '',
+    key: 'entries_count',
+    label: 'Numbers',
   },
   {
     key: 'actions',

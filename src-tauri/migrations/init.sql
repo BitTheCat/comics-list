@@ -40,3 +40,6 @@ CREATE TABLE IF NOT EXISTS entries (
   FOREIGN KEY (series_id) REFERENCES series(id)
 );
 
+CREATE INDEX IF NOT EXISTS idx_entries_series_id
+ON entries(series_id);
+
