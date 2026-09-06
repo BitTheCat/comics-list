@@ -5,6 +5,14 @@
     form {
         @apply space-y-4;
     }
+
+    button:not(:disabled) {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
 }
 
 .text-muted {

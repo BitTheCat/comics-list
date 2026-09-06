@@ -8,8 +8,14 @@
     </div>
 
     <Table v-else :items="entries" :fields="fields">
+        <template #pub_month="{ data }">
+            {{ formatMonth(data) }}
+        </template>
         <template #actions="{ item }">
-            <button class="btn btn-sm" @click="deleteElement(item.id)">Delete</button>
+            <div class="flex gap-2">
+                <EditButton />
+                <DeleteButton @click="deleteElement(item.id)"/>
+            </div>
         </template>
     </Table>
     <CreateEntryModal v-if="props.id" v-model="showModal" :series_id="props.id" @created="onCreated" />
@@ -20,6 +26,9 @@ import { ref, watch } from "vue";
 import { api } from "../api";
 import Table from "../components/Table.vue";
 import CreateEntryModal from "../components/CreateEntryModal.vue";
+import EditButton from "../components/EditButton.vue";
+import DeleteButton from "../components/DeleteButton.vue";
+
 
 // No script logic yet; kept as <script setup> for consistency
 
@@ -45,6 +54,14 @@ const fields = ref<any[]>([
 ]);
 
 const entries = ref<any[]>([]);
+
+const monthFormatter = new Intl.DateTimeFormat("it-IT", { month: "long" });
+
+const formatMonth = (month: number | null): string => {
+    if (month == null || month < 1 || month > 12) return "—";
+    const formattedMonth = monthFormatter.format(new Date(2000, month - 1, 1));
+    return formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
+};
 
 const fetchEntries = async () => {
     const res = await api.getEntries(props.id);

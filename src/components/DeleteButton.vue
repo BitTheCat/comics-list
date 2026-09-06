@@ -1,0 +1,9 @@
+<template>
+    <button title="Delete" class="text-red-500">
+        <Trash :size="16" />
+    </button>
+</template>
+
+<script setup lang="ts">
+import { Trash } from "lucide-vue-next";
+</script>

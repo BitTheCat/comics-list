@@ -1,12 +1,14 @@
 <template>
   <div>
       <div class="flex gap-4">
-          <button class="btn btn-sm" @click="toggle">Toggle Theme</button>
           <button class="btn  btn-sm" @click="showModal = true">Add Series</button>
       </div>
       <Table :items="series" :fields="fields">
           <template #actions="{ item }">
-              <button class="btn btn-sm" @click="viewDetails(item.id)">Details</button>
+          <div class="flex gap-2">
+                <EditButton />
+                <ViewButton @click="viewDetails(item.id)" />
+          </div>
           </template>
       </Table>
   </div>
@@ -19,13 +21,10 @@ import Table from '../components/Table.vue';
 import CreateSeriesModal from '../components/CreateSeriesModal.vue';
 import { api } from '../api';
 import { useRouter } from 'vue-router';
+import EditButton from '../components/EditButton.vue';
+import ViewButton from '../components/ViewButton.vue';
 
 const router = useRouter();
-
-const toggle = () => {
-  const html = document.documentElement;
-  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-};
 
 const showModal = ref(false);
 
@@ -41,6 +40,10 @@ const fields = ref([
   {
     key: 'publisher.name',
     label: 'Publisher',
+  },
+  {
+    key: 'start_year',
+    label: 'Year',
   },
   {
     key: 'entries_count',
