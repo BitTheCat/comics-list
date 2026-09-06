@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import { Pencil } from "lucide-vue-next";
+import { Pencil } from '@lucide/vue';
 </script>

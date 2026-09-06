@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import { Eye } from "lucide-vue-next";
+import { Eye } from '@lucide/vue';
 </script>

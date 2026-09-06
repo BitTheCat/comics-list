@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { Sun, Moon } from 'lucide-vue-next';
+  import { Sun, Moon } from '@lucide/vue';
   import { ref } from 'vue';
 
   const theme = ref('light');
