@@ -87,7 +87,7 @@ const create = async () => {
     const publisher = await api.findOrCreatePublisher(publisherName.value) as Publisher;
     await api.createSeries({
       title: title.value.trim(),
-      series_title: description.value || null,
+      description: description.value || null,
       publisher_id: publisher.id,
       start_year: null,
       end_year: null,

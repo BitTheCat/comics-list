@@ -15,7 +15,7 @@ export const mockSeries = [
   {
     id: 's1',
     title: 'Spawn',
-    series_title: 'Spawn',
+    description: 'Prima edizione italiana di Spawn.',
     publisher_id: 'p1',
     publisher: mockPublishers[0],
     start_year: 1990,
@@ -25,7 +25,7 @@ export const mockSeries = [
   {
     id: 's2',
     title: 'Spawn',
-    series_title: 'Spawn',
+    description: 'Edizione italiana successiva di Spawn.',
     publisher_id: 'p2',
     publisher: mockPublishers[1],
     start_year: 1996,

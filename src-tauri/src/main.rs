@@ -2,11 +2,11 @@
 
 mod db;
 
+use chrono::Utc;
 use db::{create_series, init_db, list_series, SeriesRow};
-use serde::Serialize;
+use serde::Deserialize;
 use tauri::Manager;
 use uuid::Uuid;
-use chrono::Utc;
 
 #[tauri::command]
 fn api_list_series() -> Result<Vec<SeriesRow>, String> {
@@ -14,10 +14,10 @@ fn api_list_series() -> Result<Vec<SeriesRow>, String> {
     list_series(&conn).map_err(|e| format!("db query error: {}", e))
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
 struct CreateSeriesPayload {
     pub title: String,
-    pub series_title: Option<String>,
+    pub description: Option<String>,
     pub publisher_id: Option<String>,
     pub start_year: Option<i32>,
     pub end_year: Option<i32>,
@@ -33,7 +33,7 @@ fn api_create_series(payload: CreateSeriesPayload) -> Result<String, String> {
         &conn,
         &id,
         &payload.title,
-        payload.series_title.as_deref(),
+        payload.description.as_deref(),
         payload.publisher_id.as_deref(),
         payload.start_year,
         payload.end_year,
@@ -58,4 +58,3 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-

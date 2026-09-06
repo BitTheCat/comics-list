@@ -11,8 +11,7 @@ CREATE TABLE IF NOT EXISTS series (
   id TEXT PRIMARY KEY,
   -- title is the franchise/title (e.g. "Spawn")
   title TEXT NOT NULL,
-  -- optional human readable run title (e.g. "Spawn (Casa 1)")
-  series_title TEXT,
+  description TEXT,
   publisher_id TEXT,
   start_year INTEGER,
   end_year INTEGER,
