@@ -6,8 +6,25 @@
       <p class="py-4">Press ESC key or click outside to close</p>
 
       <form @submit.prevent="create">
-        <input class="input" v-model="title" placeholder="New work title" />
+        <input class="input" v-model="title" placeholder="New series title" />
         <br />
+        <input
+          class="input"
+          v-model="publisherName"
+          list="publisher-options"
+          placeholder="Publisher"
+          @input="searchPublishers"
+        />
+        <datalist id="publisher-options">
+          <option
+            v-for="publisher in publisherSuggestions"
+            :key="publisher.id"
+            :value="publisher.name"
+          />
+        </datalist>
+        <p class="text-sm opacity-70">
+          If the publisher does not exist, it will be created.
+        </p>
         <textarea class="textarea" v-model="description" placeholder="Description (optional)"></textarea>
         <br />
         <div class="modal-action" style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
@@ -22,6 +39,7 @@
 <script lang="ts" setup>
 import { ref, toRef, watch, onBeforeUnmount } from 'vue';
 import { api } from '../api';
+import type { Publisher } from '../mocks/api';
 
 const props = defineProps({
   modelValue: {
@@ -39,6 +57,9 @@ const emit = defineEmits<{
 
 const title = ref('');
 const description = ref('');
+const publisherName = ref('');
+const publisherSuggestions = ref<Publisher[]>([]);
+let searchSequence = 0;
 
 const close = () => {
   emit('update:modelValue', false);
@@ -55,19 +76,28 @@ watch(modelValue, (val) => {
 
 onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 
+const searchPublishers = async () => {
+  const sequence = ++searchSequence;
+  const publishers = await api.listPublishers(publisherName.value) as Publisher[];
+  if (sequence === searchSequence) publisherSuggestions.value = publishers;
+};
+
 const create = async () => {
-  if (!title.value) return;
+  if (!title.value.trim() || !publisherName.value.trim()) return;
   try {
+    const publisher = await api.findOrCreatePublisher(publisherName.value) as Publisher;
     await api.createSeries({
-      title: title.value,
+      title: title.value.trim(),
       series_title: description.value || null,
-      publisher_id: null,
+      publisher_id: publisher.id,
       start_year: null,
       end_year: null,
       notes: null,
     });
     title.value = '';
     description.value = '';
+    publisherName.value = '';
+    publisherSuggestions.value = [];
     emit('created');
     emit('update:modelValue', false);
   } catch (e) {

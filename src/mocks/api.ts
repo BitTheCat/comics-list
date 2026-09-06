@@ -1,10 +1,23 @@
 // Mock API for frontend development without Tauri/Rust backend.
+export interface Publisher {
+  id: string;
+  name: string;
+  notes: string | null;
+}
+
+export const mockPublishers: Publisher[] = [
+  { id: 'p1', name: 'Star Comics', notes: null },
+  { id: 'p2', name: 'Panini Comics', notes: null },
+  { id: 'p3', name: 'Cult Comics', notes: null },
+];
+
 export const mockSeries = [
   {
     id: 's1',
     title: 'Spawn',
-    series_title: 'Spawn (Casa 1)',
-    publisher: { id: 'p1', name: 'Casa 1' },
+    series_title: 'Spawn',
+    publisher_id: 'p1',
+    publisher: mockPublishers[0],
     start_year: 1990,
     end_year: 1995,
     notes: '',
@@ -12,8 +25,9 @@ export const mockSeries = [
   {
     id: 's2',
     title: 'Spawn',
-    series_title: 'Spawn (Casa 2)',
-    publisher: { id: 'p2', name: 'Casa 2' },
+    series_title: 'Spawn',
+    publisher_id: 'p2',
+    publisher: mockPublishers[1],
     start_year: 1996,
     end_year: null,
     notes: '',
@@ -36,9 +50,53 @@ export async function getEntries(seriesId: string) {
   return new Promise(resolve => setTimeout(() => resolve(s ? s : []), 50));
 }
 
+export async function getPublishers(query = '') {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const publishers = normalizedQuery
+    ? mockPublishers.filter((publisher) =>
+        publisher.name.toLocaleLowerCase().includes(normalizedQuery),
+      )
+    : mockPublishers;
+
+  return new Promise<Publisher[]>((resolve) =>
+    setTimeout(() => resolve([...publishers]), 50),
+  );
+}
+
+export async function getPublisher(id: string) {
+  const publisher = mockPublishers.find((item) => item.id === id) ?? null;
+  return new Promise<Publisher | null>((resolve) =>
+    setTimeout(() => resolve(publisher), 50),
+  );
+}
+
+export async function createPublisher(payload: { name: string; notes?: string | null }) {
+  const name = payload.name.trim();
+  if (!name) throw new Error('Publisher name is required');
+
+  const existing = mockPublishers.find(
+    (publisher) => publisher.name.toLocaleLowerCase() === name.toLocaleLowerCase(),
+  );
+  if (existing) return existing;
+
+  const publisher: Publisher = {
+    id: 'p' + Math.random().toString(36).slice(2, 9),
+    name,
+    notes: payload.notes?.trim() || null,
+  };
+  mockPublishers.push(publisher);
+
+  return new Promise<Publisher>((resolve) =>
+    setTimeout(() => resolve(publisher), 50),
+  );
+}
+
 export async function createSeries(payload: any) {
   const id = 's' + Math.random().toString(36).slice(2, 9);
-  const item = { ...payload, id, entries: [] };
+  const publisher = payload.publisher_id
+    ? await getPublisher(payload.publisher_id)
+    : null;
+  const item = { ...payload, id, publisher };
   mockSeries.push(item);
   return new Promise(resolve => setTimeout(() => resolve(id), 50));
 }

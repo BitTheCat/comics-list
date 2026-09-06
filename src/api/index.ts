@@ -18,6 +18,30 @@ export const api = {
     if (isTauri) return invokeTauri('api_create_series', { payload: p });
     return mock.createSeries(p);
   },
+  listPublishers: (query = '') => {
+    if (isTauri) return invokeTauri('api_list_publishers', { query });
+    return mock.getPublishers(query);
+  },
+  getPublisher: (id: string) => {
+    if (isTauri) return invokeTauri('api_get_publisher', { id });
+    return mock.getPublisher(id);
+  },
+  createPublisher: (payload: { name: string; notes?: string | null }) => {
+    if (isTauri) return invokeTauri('api_create_publisher', { payload });
+    return mock.createPublisher(payload);
+  },
+  findOrCreatePublisher: async (name: string) => {
+    const normalizedName = name.trim();
+    if (!normalizedName) throw new Error('Publisher name is required');
+
+    const publishers = await api.listPublishers(normalizedName) as mock.Publisher[];
+    const exactMatch = publishers.find(
+      (publisher) =>
+        publisher.name.toLocaleLowerCase() === normalizedName.toLocaleLowerCase(),
+    );
+
+    return exactMatch ?? api.createPublisher({ name: normalizedName });
+  },
   getEntries: (seriesId: string) => {
     if (isTauri) return invokeTauri('api_list_entries', { seriesId });
     return mock.getEntries(seriesId);
