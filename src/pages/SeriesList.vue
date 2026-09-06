@@ -5,10 +5,6 @@
           <button class="btn  btn-sm" @click="showModal = true">Add Series</button>
       </div>
       <Table :items="series" :fields="fields">
-          <template #title="{ item }">
-              <p>{{ item.title }}</p>
-              <span class="text-muted">{{item.description ?? 'aaaaaaaaaaaa'}}</span>
-          </template>
           <template #actions="{ item }">
               <button class="btn btn-sm" @click="viewDetails(item.id)">Details</button>
           </template>
@@ -37,6 +33,18 @@ const fields = ref([
   {
     key: 'title',
     label: 'Title',
+  },
+  {
+    key: 'description',
+    label: 'Description',
+  },
+  {
+    key: 'publisher.name',
+    label: 'Publisher',
+  },
+  {
+    key: '',
+    label: '',
   },
   {
     key: 'actions',

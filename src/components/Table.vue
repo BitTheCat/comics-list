@@ -9,8 +9,8 @@
     <tbody>
       <tr v-for="item in items" :key="item.id">
         <td v-for="value in fields" :key="value.key">
-            <slot :name="value.key" :data="item[value.key]" :item="item">
-                {{ item[value.key] }}
+            <slot :name="value.key" :data="getValue(item, value.key)" :item="item">
+                {{ getValue(item, value.key) }}
             </slot>
         </td>
       </tr>
@@ -19,7 +19,7 @@
 </div>
 </template>
 <script lang="ts" setup>
-import { computed, PropType, ref, watch } from 'vue';
+import { PropType } from 'vue';
 
 interface Field {
   key: string;
@@ -30,5 +30,11 @@ const props = defineProps({
   items: Array as PropType<any[]>,
   fields: Array as PropType<Field[]>,
 })
+
+function getValue(obj: any, path?: string) {
+  if (obj == null || !path) return undefined;
+  const parts = path.replace(/\[(\w+)\]/g, '.$1').split('.');
+  return parts.reduce((o: any, key: string) => (o == null ? undefined : o[key]), obj);
+}
 
 </script>
