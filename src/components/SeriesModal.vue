@@ -33,18 +33,8 @@
           <textarea class="textarea" v-model="form.description" placeholder="Description (optional)"></textarea>
         </div>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Select
-            v-model="form.start_year"
-            label="Start year"
-            placeholder="Not specified"
-            :options="years"
-          />
-          <Select
-            v-model="form.end_year"
-            label="End year"
-            placeholder="Not specified"
-            :options="years"
-          />
+          <YearSelect v-model="form.start_year" label="Start year" />
+          <YearSelect v-model="form.end_year" label="End year" />
         </div>
         <div class="form-group">
           <div class="modal-action" style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
@@ -61,7 +51,7 @@
 import { ref, toRef, watch, onBeforeUnmount } from 'vue';
 import { api } from '../api';
 import type { Publisher, Series } from '../types';
-import Select from './Select.vue';
+import YearSelect from './YearSelect.vue';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
@@ -79,6 +69,7 @@ const emit = defineEmits<{
 }>();
 
 interface Form {
+  id: string | null;
   title: string;
   description: string;
   publisher_name: string | null;
@@ -99,11 +90,7 @@ const createForm = (series?: Series | null): Form => ({
 
 const form = ref<Form>(createForm(props.series));
 
-const currentYear = new Date().getFullYear();
-const years = Array.from(
-  { length: currentYear + 2 - 1900 },
-  (_, index) => currentYear + 1 - index,
-);
+
 const publisherSuggestions = ref<Publisher[]>([]);
 let searchSequence = 0;
 
