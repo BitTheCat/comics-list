@@ -6,30 +6,29 @@
       <p class="py-4">Press ESC key or click outside to close</p>
 
       <form @submit.prevent="create">
-        <input class="input" v-model="title" placeholder="New series title" />
-        <br />
-        <input
-          class="input"
-          v-model="publisherName"
-          list="publisher-options"
-          placeholder="Publisher"
-          @input="searchPublishers"
-        />
-        <datalist id="publisher-options">
-          <option
-            v-for="publisher in publisherSuggestions"
-            :key="publisher.id"
-            :value="publisher.name"
+        <div class="form-group">
+          <input class="input" v-model="title" placeholder="New series title" />
+        </div>
+        <div class="form-group">
+          <input
+            class="input"
+            v-model="publisherName"
+            list="publisher-options"
+            placeholder="Publisher"
+            @input="searchPublishers"
           />
-        </datalist>
-        <p class="text-sm opacity-70">
-          If the publisher does not exist, it will be created.
-        </p>
-        <textarea class="textarea" v-model="description" placeholder="Description (optional)"></textarea>
-        <br />
-        <div class="modal-action" style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-          <button class="btn" type="button" @click="close">Cancel</button>
-          <button class="btn" type="submit">Create</button>
+          <p class="text-xs text-muted">
+            If the publisher does not exist, it will be created.
+          </p>
+        </div>
+        <div class="form-group">
+          <textarea class="textarea" v-model="description" placeholder="Description (optional)"></textarea>
+        </div>
+        <div class="form-group">
+          <div class="modal-action" style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+            <button class="btn" type="button" @click="close">Cancel</button>
+            <button class="btn" type="submit">Create</button>
+          </div>
         </div>
       </form>
     </div>

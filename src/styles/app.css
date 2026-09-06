@@ -1,8 +1,20 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@layer base {
+    form {
+        @apply space-y-4;
+    }
+}
+
 .text-muted {
     color: gray;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 @media (prefers-color-scheme: dark) {
