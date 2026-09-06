@@ -1,7 +1,10 @@
 <template>
   <div id="app" class="p-4">
     <header class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-bold">comics-list</h1>
+      <div>
+          <h1 class="text-2xl font-bold">Comics List</h1>
+          <span class="mt-0 text-xs text-muted">by BitTheCat</span>
+      </div>
       <div class="breadcrumbs text-sm">
         <!-- <RouterLink to="/series">Series</RouterLink> -->
         <button @click="toggle">

@@ -6,27 +6,31 @@
       <Table :items="series" :fields="fields">
           <template #actions="{ item }">
           <div class="flex gap-2">
-                <EditButton />
+                <EditButton @click="openEdit(item)"/>
                 <ViewButton @click="viewDetails(item.id)" />
+                <DeleteButton :disabled="item.entries_count > 0" @click="deleteSeries(item.id)" />
           </div>
           </template>
       </Table>
   </div>
-  <CreateSeriesModal v-model="showModal" @created="onCreated"/>
+  <SeriesModal v-model="showModal" :series="editItem" @created="onCreated"/>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts" >
 import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
-import CreateSeriesModal from '../components/CreateSeriesModal.vue';
+import SeriesModal from '../components/SeriesModal.vue';
 import { api } from '../api';
 import { useRouter } from 'vue-router';
 import EditButton from '../components/EditButton.vue';
 import ViewButton from '../components/ViewButton.vue';
+import DeleteButton from '../components/DeleteButton.vue';
+
 
 const router = useRouter();
 
 const showModal = ref(false);
+const editItem = ref<Series | null>(null);
 
 const fields = ref([
   {
@@ -71,6 +75,20 @@ const loadSeries = async () => {
 onMounted(() => {
   loadSeries();
 });
+
+const openEdit = (series: any) => {
+  showModal.value = true;
+  editItem.value = series;
+};
+
+const deleteSeries = async (id: string | number) => {
+  try {
+    await api.deleteSeries({ id });
+    await refreshSeries();
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const refreshSeries = loadSeries;
 

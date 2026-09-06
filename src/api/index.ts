@@ -18,6 +18,14 @@ export const api = {
     if (isTauri) return invokeTauri('api_create_series', { payload: p });
     return mock.createSeries(p);
   },
+  updateSeries: (p: any) => {
+    if (isTauri) return Promise.reject(new Error('Updating series is not supported in Tauri yet'));
+    return mock.updateSeries(p);
+  },
+  deleteSeries: (p: any) => {
+    if (isTauri) return Promise.reject(new Error('Deleting series is not supported in Tauri yet'));
+    return mock.deleteSeries(p);
+  },
   listPublishers: (query = '') => {
     if (isTauri) return invokeTauri('api_list_publishers', { query });
     return mock.getPublishers(query);

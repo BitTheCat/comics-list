@@ -105,3 +105,18 @@ export async function createSeries(payload: any) {
   return new Promise(resolve => setTimeout(() => resolve(id), 50));
 }
 
+export async function updateSeries(payload: any) {
+  const index = mockSeries.findIndex((item) => item.id === payload.id);
+  if (index === -1) throw new Error('Series not found');
+  mockSeries[index] = { ...mockSeries[index], ...payload };
+  return new Promise(resolve => setTimeout(() => resolve(payload.id), 50));
+}
+
+export async function deleteSeries(payload: any) {
+  const index = mockSeries.findIndex((item) => item.id === payload.id);
+  if (index === -1) throw new Error('Series not found');
+  mockSeries.splice(index, 1);
+  return new Promise(resolve => setTimeout(() => resolve(payload.id), 50));
+}
+
+
