@@ -1,4 +1,3 @@
--- Initial schema for comics-list (simplified: series + publishers + entries)
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS publishers (
@@ -8,10 +7,9 @@ CREATE TABLE IF NOT EXISTS publishers (
 );
 
 CREATE TABLE IF NOT EXISTS series (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  -- title is the franchise/title (e.g. "Spawn")
+  id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
-  description TEXT,
+  series_title TEXT,
   publisher_id TEXT,
   start_year INTEGER,
   end_year INTEGER,
@@ -23,7 +21,7 @@ CREATE TABLE IF NOT EXISTS series (
 
 CREATE TABLE IF NOT EXISTS entries (
   id TEXT PRIMARY KEY,
-  series_id INTEGER NOT NULL,
+  series_id TEXT NOT NULL,
   issue_number TEXT NOT NULL,
   volume TEXT,
   title TEXT,
@@ -39,7 +37,3 @@ CREATE TABLE IF NOT EXISTS entries (
   updated_at TEXT NOT NULL,
   FOREIGN KEY (series_id) REFERENCES series(id)
 );
-
-CREATE INDEX IF NOT EXISTS idx_entries_series_id
-ON entries(series_id);
-

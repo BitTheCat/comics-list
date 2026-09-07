@@ -1,4 +1,5 @@
 // Mock API for frontend development without Tauri/Rust backend.
+import { COMIC_CONDITIONS } from '../types';
 export interface Publisher {
   id: string;
   name: string;
@@ -116,6 +117,7 @@ export const mockEntries = [
     pub_month: (index % 12) + 1,
     cover_path: null,
     tags: ['spawn'],
+    condition: COMIC_CONDITIONS[index % COMIC_CONDITIONS.length],
   })),
   ...Array.from({ length: 11 }, (_, index) => ({
     id: `e2-${index + 1}`,
@@ -126,6 +128,7 @@ export const mockEntries = [
     pub_month: (index % 12) + 1,
     cover_path: null,
     tags: ['spawn'],
+    condition: COMIC_CONDITIONS[(index + 2) % COMIC_CONDITIONS.length],
   })),
 ];
 

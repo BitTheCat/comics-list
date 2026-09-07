@@ -74,6 +74,7 @@ describe('EntryModal', () => {
       pub_month: 1,
       cover_path: null,
       tags: [],
+      condition: 'NM',
     };
 
     const { getByRole, getByDisplayValue } = render(EntryModal, {

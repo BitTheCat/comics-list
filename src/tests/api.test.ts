@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { COMIC_CONDITIONS } from '../types';
 import {
   createPublisher,
   getEntriesPaginated,
@@ -64,6 +65,9 @@ describe('mock api', () => {
       total_items: 32,
       total_pages: 4,
     });
+    expect(
+      response.items.every((entry) => COMIC_CONDITIONS.includes(entry.condition)),
+    ).toBe(true);
   });
 
   it('searches publishers without considering case', async () => {

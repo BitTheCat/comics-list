@@ -90,6 +90,7 @@ const createForm = (entry?: Entry | null): Entry => ({
   pub_month: entry?.pub_month ?? null,
   cover_path: entry?.cover_path ?? null,
   tags: entry?.tags ?? [],
+  condition: entry?.condition ?? null,
 });
 
 const form = ref<Entry>(createForm(props.entry));

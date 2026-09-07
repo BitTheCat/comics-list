@@ -20,129 +20,92 @@ pub fn db_path() -> Option<PathBuf> {
 pub fn init_db() -> Result<Connection> {
     let path = db_path().expect("could not determine app data directory");
     let conn = Connection::open(path)?;
-    // Execute migration bundled with the binary
-    let sql = include_str!("../migrations/init.sql");
-    conn.execute_batch(sql)?;
-    migrate_series_description(&conn)?;
-    migrate_series_id_to_integer(&conn)?;
+    run_migrations(&conn)?;
     Ok(conn)
 }
 
-fn migrate_series_description(conn: &Connection) -> Result<()> {
-    let has_series_title: bool = conn.query_row(
-        "SELECT EXISTS(
-            SELECT 1 FROM pragma_table_info('series') WHERE name = 'series_title'
-        )",
-        [],
-        |row| row.get(0),
-    )?;
-    let has_description: bool = conn.query_row(
-        "SELECT EXISTS(
-            SELECT 1 FROM pragma_table_info('series') WHERE name = 'description'
-        )",
-        [],
-        |row| row.get(0),
+struct Migration {
+    version: i64,
+    name: &'static str,
+    sql: &'static str,
+    should_run: fn(&Connection) -> Result<bool>,
+}
+
+fn run_migrations(conn: &Connection) -> Result<()> {
+    conn.execute_batch(
+        "CREATE TABLE IF NOT EXISTS schema_migrations (
+            version INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );",
     )?;
 
-    if has_series_title && !has_description {
+    let migrations = [
+        Migration {
+            version: 1,
+            name: "initial schema",
+            sql: include_str!("../migrations/0001_initial_schema.sql"),
+            should_run: |_| Ok(true),
+        },
+        Migration {
+            version: 2,
+            name: "rename series title to description",
+            sql: include_str!("../migrations/0002_rename_series_title_to_description.sql"),
+            should_run: |connection| column_exists(connection, "series", "series_title"),
+        },
+        Migration {
+            version: 3,
+            name: "use integer series identifiers",
+            sql: include_str!("../migrations/0003_integer_series_ids.sql"),
+            should_run: |connection| {
+                let id_type: String = connection.query_row(
+                    "SELECT type FROM pragma_table_info('series') WHERE name = 'id'",
+                    [],
+                    |row| row.get(0),
+                )?;
+                Ok(!id_type.eq_ignore_ascii_case("INTEGER"))
+            },
+        },
+        Migration {
+            version: 4,
+            name: "add entry condition",
+            sql: include_str!("../migrations/0004_add_entry_condition.sql"),
+            should_run: |connection| Ok(!column_exists(connection, "entries", "condition")?),
+        },
+    ];
+
+    for migration in migrations {
+        let was_applied: bool = conn.query_row(
+            "SELECT EXISTS(
+                SELECT 1 FROM schema_migrations WHERE version = ?1
+            )",
+            [migration.version],
+            |row| row.get(0),
+        )?;
+        if was_applied {
+            continue;
+        }
+
+        if (migration.should_run)(conn)? {
+            conn.execute_batch(migration.sql)?;
+        }
         conn.execute(
-            "ALTER TABLE series RENAME COLUMN series_title TO description",
-            [],
+            "INSERT INTO schema_migrations (version, name) VALUES (?1, ?2)",
+            params![migration.version, migration.name],
         )?;
     }
 
     Ok(())
 }
 
-fn migrate_series_id_to_integer(conn: &Connection) -> Result<()> {
-    let id_type: String = conn.query_row(
-        "SELECT type FROM pragma_table_info('series') WHERE name = 'id'",
-        [],
+fn column_exists(conn: &Connection, table: &str, column: &str) -> Result<bool> {
+    conn.query_row(
+        "SELECT EXISTS(
+            SELECT 1 FROM pragma_table_info(?1) WHERE name = ?2
+        )",
+        params![table, column],
         |row| row.get(0),
-    )?;
-    if id_type.eq_ignore_ascii_case("INTEGER") {
-        return Ok(());
-    }
-
-    conn.execute_batch(
-        "PRAGMA foreign_keys = OFF;
-        BEGIN IMMEDIATE;
-
-        CREATE TABLE series_new (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          title TEXT NOT NULL,
-          description TEXT,
-          publisher_id TEXT,
-          start_year INTEGER,
-          end_year INTEGER,
-          notes TEXT,
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL,
-          FOREIGN KEY (publisher_id) REFERENCES publishers(id)
-        );
-
-        INSERT INTO series_new (
-          title, description, publisher_id, start_year, end_year, notes, created_at, updated_at
-        )
-        SELECT
-          title, description, publisher_id, start_year, end_year, notes, created_at, updated_at
-        FROM series
-        ORDER BY rowid;
-
-        CREATE TEMP TABLE series_id_map AS
-        SELECT legacy.id AS old_id, numbered.new_id
-        FROM (
-          SELECT id, ROW_NUMBER() OVER (ORDER BY rowid) AS position
-          FROM series
-        ) legacy
-        JOIN (
-          SELECT id AS new_id, ROW_NUMBER() OVER (ORDER BY id) AS position
-          FROM series_new
-        ) numbered ON numbered.position = legacy.position;
-
-        CREATE TABLE entries_new (
-          id TEXT PRIMARY KEY,
-          series_id INTEGER NOT NULL,
-          issue_number TEXT NOT NULL,
-          volume TEXT,
-          title TEXT,
-          description TEXT,
-          pub_year INTEGER,
-          pub_month INTEGER,
-          cover_path TEXT,
-          cover_url TEXT,
-          tags TEXT,
-          read_status TEXT,
-          rating INTEGER,
-          created_at TEXT NOT NULL,
-          updated_at TEXT NOT NULL,
-          FOREIGN KEY (series_id) REFERENCES series_new(id)
-        );
-
-        INSERT INTO entries_new (
-          id, series_id, issue_number, volume, title, description, pub_year, pub_month,
-          cover_path, cover_url, tags, read_status, rating, created_at, updated_at
-        )
-        SELECT
-          entry.id, id_map.new_id, entry.issue_number, entry.volume, entry.title,
-          entry.description, entry.pub_year, entry.pub_month, entry.cover_path,
-          entry.cover_url, entry.tags, entry.read_status, entry.rating,
-          entry.created_at, entry.updated_at
-        FROM entries entry
-        JOIN series_id_map id_map ON id_map.old_id = entry.series_id;
-
-        DROP TABLE entries;
-        DROP TABLE series;
-        ALTER TABLE series_new RENAME TO series;
-        ALTER TABLE entries_new RENAME TO entries;
-        CREATE INDEX idx_entries_series_id ON entries(series_id);
-        DROP TABLE series_id_map;
-
-        COMMIT;
-        PRAGMA foreign_keys = ON;",
-    )?;
-
-    Ok(())
+    )
 }
 
 #[derive(Debug, Serialize)]

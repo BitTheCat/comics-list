@@ -11,6 +11,7 @@ const entry = {
   pub_month: 3,
   cover_path: '/covers/entry-1.jpg',
   tags: ['Hero'],
+  condition: 'NM' as const,
 };
 
 describe('EntryDetailsPanel', () => {
@@ -34,7 +35,7 @@ describe('EntryDetailsPanel', () => {
     expect(getByText('Marzo 2024')).toBeTruthy();
     expect(getByText('Hero')).toBeTruthy();
 
-    await fireEvent.click(getByRole('button', { name: 'View' }));
+    await fireEvent.click(getByRole('img', { name: 'Cover' }));
     await fireEvent.click(getByRole('button', { name: 'Edit' }));
     await fireEvent.click(getByRole('button', { name: 'Delete' }));
 
