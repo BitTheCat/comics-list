@@ -143,7 +143,7 @@ export async function getSeriesPaginated(
 ): Promise<PaginatedResponse<SeriesResource>> {
   const page = Math.max(1, Math.trunc(request.page ?? 1));
   const pageSize = Math.min(100, Math.max(1, Math.trunc(request.page_size ?? 10)));
-  const query = request.query?.trim().toLocaleLowerCase() ?? '';
+  const query = request.query?.trim().toLocaleLowerCase() ?? null;
   const allSeries = await getSeries();
   const filteredSeries = query
     ? allSeries.filter((series) =>

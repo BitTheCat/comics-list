@@ -3,7 +3,12 @@
       <div class="flex gap-4">
           <button class="btn  btn-sm" @click="showModal = true">Add Series</button>
       </div>
-      <Table :items="series" :fields="fields">
+      <Table 
+        :items="series.items" 
+        :fields="fields" 
+        :pagination="series.pagination"
+        @previous="loadRequestPage"
+        @next="loadRequestPage">
           <template #actions="{ item }">
           <div class="flex gap-2">
                 <EditButton @click="openEdit(item)"/>
@@ -19,12 +24,14 @@
 <script setup lang="ts" >
 import { onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
-import SeriesModal from '../components/SeriesModal.vue';
+import SeriesModal from '../components/series/SeriesModal.vue';
 import { api } from '../api';
 import { useRouter } from 'vue-router';
 import EditButton from '../components/EditButton.vue';
 import ViewButton from '../components/ViewButton.vue';
 import DeleteButton from '../components/DeleteButton.vue';
+import type { Series } from '../types';
+import type { PaginatedResponse, SeriesResource } from '../mocks/api';
 
 
 const router = useRouter();
@@ -56,17 +63,34 @@ const fields = ref([
   {
     key: 'actions',
     label: '',
+    tdClass: 'flex justify-end',
   },
 ]);
 
-const series = ref<any[]>([]);
+const series = ref<PaginatedResponse<SeriesResource>>({
+  items: [],
+  pagination: {
+    page: 1,
+    page_size: 10,
+    total_items: 0,
+    total_pages: 1,
+  },
+});
 
 const loadSeries = async () => {
   try {
-    const res = await api.listSeries();
-    // assign a fresh array with new object references to ensure Vue reactivity
-    // picks up deep changes and child components receive a new prop reference.
-    series.value = Array.isArray(res) ? (res as any[]).map((s) => ({ ...s })) : [];
+    const res = await api.listSeriesPaginated();
+    series.value = res as PaginatedResponse<SeriesResource>;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const loadRequestPage = async (isNext: boolean) => {
+  try {
+    const pageValue = isNext ? series.value.pagination.page + 1 : series.value.pagination.page - 1;
+    const res = await api.listSeriesPaginated({ page: pageValue });
+    series.value = res as PaginatedResponse<SeriesResource>;
   } catch (e) {
     console.error(e);
   }

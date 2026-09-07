@@ -1,95 +1,204 @@
 <template>
     <div class="flex gap-2">
         <RouterLink class="btn btn-sm" to="/series">Back to series</RouterLink>
-        <button class="btn btn-sm" @click="showModal = true">Add number</button>
+        <button class="btn btn-sm" :disabled="!seriesId" @click="openCreate">Add number</button>
     </div>
+
     <div v-if="!props.id">
         <p>Select a work/series to see entries. (Placeholder)</p>
     </div>
 
-    <Table v-else :items="entries" :fields="fields">
-        <template #pub_month="{ data }">
-            {{ formatMonth(data) }}
-        </template>
-        <template #actions="{ item }">
-            <div class="flex gap-2">
-                <EditButton @click="openEdit(item)" />
-                <DeleteButton @click="deleteElement(item.id)"/>
-            </div>
-        </template>
-    </Table>
-    <EntryModal v-if="seriesId" v-model="showModal" :entry="editItem" :series_id="seriesId" @created="onCreated" />
+    <div v-else class="grid items-start gap-4 md:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)]">
+        <section class="min-w-0">
+            <Table
+                :items="entries.items"
+                :fields="fields"
+                :pagination="entries.pagination"
+                selectable
+                :selected-id="selectedEntry?.id"
+                @row-click="selectEntry"
+                @previous="loadRequestPage"
+                @next="loadRequestPage"
+            >
+                <template #year="{ item }">
+                    {{ formatPublication(item as Entry) }}
+                </template>
+
+                <template #actions="{ item }">
+                    <div class="flex justify-end gap-2 md:hidden" @click.stop>
+                        <ViewButton
+                            v-if="item.cover_path"
+                            @click="openCoverModal(item as Entry)"
+                        />
+                        <EditButton @click="openEdit(item as Entry)" />
+                        <DeleteButton @click="deleteElement(item.id)" />
+                    </div>
+                </template>
+            </Table>
+        </section>
+
+        <EntryDetailsPanel
+            :entry="selectedEntry"
+            :publication="selectedEntry ? formatPublication(selectedEntry) : '—'"
+            @view="openCoverModal"
+            @edit="openEdit"
+            @delete="deleteEntry"
+        />
+    </div>
+
+    <EntryModal
+        v-if="seriesId"
+        v-model="showModal"
+        :entry="editItem"
+        :series_id="seriesId"
+        @created="onCreated"
+    />
+    <Modal
+        v-model="showCoverModal"
+        :title="`Cover: ${coverItem?.issue_number}`"
+        :show-submit="false"
+        cancel-label="Close"
+    >
+        <div class="flex justify-center">
+            <img
+                v-if="coverItem?.cover_path"
+                :src="coverItem.cover_path"
+                alt="Cover"
+                class="max-h-[70vh] max-w-full object-contain"
+            />
+        </div>
+    </Modal>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { api } from "../api";
-import Table from "../components/Table.vue";
-import EntryModal from "../components/EntryModal.vue";
-import EditButton from "../components/EditButton.vue";
+import type { PaginatedResponse } from "../mocks/api";
+import type { Entry } from "../types";
 import DeleteButton from "../components/DeleteButton.vue";
-import { Entry } from "../types";
+import EditButton from "../components/EditButton.vue";
+import EntryModal from "../components/entries/EntryModal.vue";
+import EntryDetailsPanel from "../components/entries/EntryDetailsPanel.vue";
+import Modal from "../components/Modal.vue";
+import Table from "../components/Table.vue";
+import ViewButton from "../components/ViewButton.vue";
 
+const props = withDefaults(defineProps<{
+    id?: string | null;
+}>(), {
+    id: null,
+});
 
-// No script logic yet; kept as <script setup> for consistency
+const emit = defineEmits<{
+    (e: "created"): void;
+}>();
 
-const props = defineProps({
-    id: {
-        type: String,
-        default: null,
+const seriesId = computed(() => Number(props.id));
+const showModal = ref(false);
+const editItem = ref<Entry | null>(null);
+const selectedEntry = ref<Entry | null>(null);
+const showCoverModal = ref(false);
+const coverItem = ref<Entry | null>(null);
+
+const fields = [
+    { key: "issue_number", label: "#" },
+    { key: "title", label: "Title" },
+    { key: "year", label: "Publication" },
+    {
+        key: "actions",
+        label: "",
+        thClass: "md:hidden",
+        tdClass: "md:hidden",
+    },
+];
+
+const entries = ref<PaginatedResponse<Entry>>({
+    items: [],
+    pagination: {
+        page: 1,
+        page_size: 10,
+        total_items: 0,
+        total_pages: 1,
     },
 });
 
-const seriesId = computed(() => Number(props.id));
+const monthFormatter = new Intl.DateTimeFormat("it-IT", { month: "long" });
 
-const emit = defineEmits<{
-  (e: 'created'): void;
-}>();
+const formatMonth = (month: number | null): string | null => {
+    if (month == null || month < 1 || month > 12) return null;
+    const formattedMonth = monthFormatter.format(new Date(2000, month - 1, 1));
+    return formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
+};
 
-const showModal = ref(false);
-const editItem = ref<Entry>(null);
+const formatPublication = (entry: Entry): string => {
+    const month = formatMonth(entry.pub_month);
+    return [month, entry.pub_year].filter(Boolean).join(" ") || "—";
+};
+
+const updateEntries = (response: PaginatedResponse<Entry>) => {
+    entries.value = response;
+    if (!selectedEntry.value?.id) return;
+
+    selectedEntry.value = response.items.find(
+        (entry) => entry.id === selectedEntry.value?.id,
+    ) ?? null;
+};
+
+const fetchEntries = async () => {
+    if (!props.id) return;
+    const response = await api.listEntriesPaginated(seriesId.value);
+    updateEntries(response as PaginatedResponse<Entry>);
+};
+
+const loadRequestPage = async (isNext: boolean) => {
+    try {
+        const page = isNext
+            ? entries.value.pagination.page + 1
+            : entries.value.pagination.page - 1;
+        const response = await api.listEntriesPaginated(seriesId.value, { page });
+        updateEntries(response as PaginatedResponse<Entry>);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const selectEntry = (item: Record<string, any>) => {
+    selectedEntry.value = item as Entry;
+};
+
+const openCreate = () => {
+    editItem.value = null;
+    showModal.value = true;
+};
 
 const openEdit = (item: Entry) => {
     editItem.value = item;
     showModal.value = true;
 };
 
-const fields = ref<any[]>([
-    { key: "issue_number", label: "Issue Number" },
-    { key: "title", label: "Title" },
-    { key: "pub_year", label: "Publication Year" },
-    { key: "pub_month", label: "Publication Month" },
-    { key: "actions", label: "" },
-]);
-
-const entries = ref<Entry[]>([]);
-
-const monthFormatter = new Intl.DateTimeFormat("it-IT", { month: "long" });
-
-const formatMonth = (month: number | null): string => {
-    if (month == null || month < 1 || month > 12) return "—";
-    const formattedMonth = monthFormatter.format(new Date(2000, month - 1, 1));
-    return formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
-};
-
-const fetchEntries = async () => {
-    const res = await api.getEntries(seriesId.value);
-    entries.value = res;
-};
-
-const refreshEntries = fetchEntries;
-
 const onCreated = async () => {
-  // refresh local list
-  await refreshEntries();
-  // notify parent so it can refresh its own data if needed
-  emit('created');
+    await fetchEntries();
+    emit("created");
 };
 
 const deleteElement = async (id: string) => {
     await api.deleteEntry(id);
-    refreshEntries();
+    if (selectedEntry.value?.id === id) selectedEntry.value = null;
+    await fetchEntries();
 };
 
-watch(() => props.id, fetchEntries, { immediate: true });
+const deleteEntry = async (entry: Entry) => {
+    if (entry.id) await deleteElement(entry.id);
+};
+
+const openCoverModal = (item: Entry) => {
+    coverItem.value = item;
+    showCoverModal.value = true;
+};
+
+watch(() => props.id, () => {
+    selectedEntry.value = null;
+    coverItem.value = null;
+    void fetchEntries();
+}, { immediate: true });
 </script>

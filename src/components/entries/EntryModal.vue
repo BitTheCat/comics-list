@@ -1,9 +1,12 @@
 <template>
-  <div v-if="modelValue" class="modal modal-open" @click="close">
-    <div class="modal-box" @click.stop>
-      <h3 class="text-lg font-bold">{{ form.id ? 'Edit' : 'Create' }} entry</h3>
-
-      <form @submit.prevent="createOrUpdate">
+  <Modal
+    :model-value="modelValue"
+    :submit-label="form.id ? 'Update' : 'Create'"
+    :title="`${form.id ? 'Edit' : 'Create'} entry`"
+    @submit="createOrUpdate"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <form @submit.prevent="createOrUpdate">
         <input
           id="entry-issue-number"
           v-model="form.issue_number"
@@ -31,20 +34,36 @@
           name="pub_month"
           placeholder="Publication month"
         />
-        <div class="modal-action">
-          <button class="btn" type="button" @click="close">Cancel</button>
-          <button class="btn" type="submit">{{ form.id ? 'Update' : 'Create' }}</button>
-        </div>
-      </form>
-    </div>
-  </div>
+
+        <ImageInput
+          v-model="form.cover_path"
+          class="mt-3"
+          input-id="entry-cover"
+          name="cover"
+          label="Cover image"
+          preview-alt="Cover preview"
+          remove-label="Remove cover"
+        />
+
+        <TagsInput
+          v-model="form.tags"
+          class="mt-3"
+          input-id="entry-tags"
+          name="tags"
+        />
+
+    </form>
+  </Modal>
 </template>
 
 <script lang="ts" setup>
-import { ref, toRef, watch, onBeforeUnmount } from 'vue';
-import { api } from '../api';
-import type { Entry } from '../types';
-import YearSelect from './YearSelect.vue';
+import { ref, toRef, watch } from 'vue';
+import { api } from '../../api';
+import type { Entry } from '../../types';
+import ImageInput from '../ImageInput.vue';
+import Modal from '../Modal.vue';
+import TagsInput from '../TagsInput.vue';
+import YearSelect from '../YearSelect.vue';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
@@ -75,24 +94,9 @@ const createForm = (entry?: Entry | null): Entry => ({
 
 const form = ref<Entry>(createForm(props.entry));
 
-const close = () => {
-  emit('update:modelValue', false);
-};
-
-const onKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') close();
-};
-
 watch(modelValue, (val) => {
-  if (val) {
-    form.value = createForm(props.entry);
-    window.addEventListener('keydown', onKeydown);
-  } else {
-    window.removeEventListener('keydown', onKeydown);
-  }
+  if (val) form.value = createForm(props.entry);
 });
-
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 
 const create = async () => {
   if (!form.value) return;

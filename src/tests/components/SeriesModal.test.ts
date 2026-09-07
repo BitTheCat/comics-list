@@ -1,7 +1,7 @@
 import { render } from '@testing-library/vue';
 import { describe, expect, it } from 'vitest';
 import type { Series } from '../../types';
-import SeriesModal from '../../components/SeriesModal.vue';
+import SeriesModal from '../../components/series/SeriesModal.vue';
 
 describe('SeriesModal', () => {
   it('opens in create mode', () => {

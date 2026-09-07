@@ -1,12 +1,12 @@
 <template>
-  <!-- DaisyUI-style modal using divs (not native <dialog>) -->
-  <div v-if="modelValue" class="modal modal-open" @click="close">
-    <div class="modal-box" @click.stop>
-      <h3 class="text-lg font-bold">
-        {{ form.id ? 'Update' : 'Create' }} Series
-      </h3>
-
-      <form @submit.prevent="createOrUpdate">
+  <Modal
+    :model-value="modelValue"
+    :submit-label="form.id ? 'Update' : 'Create'"
+    :title="`${form.id ? 'Update' : 'Create'} Series`"
+    @submit="createOrUpdate"
+    @update:model-value="emit('update:modelValue', $event)"
+  >
+    <form @submit.prevent="createOrUpdate">
         <div class="form-group">
           <input
                       id="series-title"
@@ -60,20 +60,16 @@
             name="end_year"
           />
         </div>
-        <div class="modal-action">
-          <button class="btn" type="button" @click="close">Cancel</button>
-          <button class="btn" type="submit">{{ form.id ? 'Update' : 'Create' }}</button>
-        </div>
-      </form>
-    </div>
-  </div>
+    </form>
+  </Modal>
 </template>
 
 <script lang="ts" setup>
-import { ref, toRef, watch, onBeforeUnmount } from 'vue';
-import { api } from '../api';
-import type { Publisher, Series } from '../types';
-import YearSelect from './YearSelect.vue';
+import { ref, toRef, watch } from 'vue';
+import { api } from '../../api';
+import type { Publisher, Series } from '../../types';
+import Modal from '../Modal.vue';
+import YearSelect from '../YearSelect.vue';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
@@ -116,16 +112,6 @@ const form = ref<Form>(createForm(props.series));
 const publisherSuggestions = ref<Publisher[]>([]);
 let searchSequence = 0;
 
-const close = () => {
-  emit('update:modelValue', false);
-};
-
-const onKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape') close();
-};
-
-
-onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown));
 
 const searchPublishers = async () => {
   const sequence = ++searchSequence;
@@ -177,11 +163,6 @@ const createOrUpdate = async () => {
 };
 
 watch(modelValue, (val) => {
-  if (val) {
-    form.value = createForm(props.series);
-    window.addEventListener('keydown', onKeydown);
-  } else {
-    window.removeEventListener('keydown', onKeydown);
-  }
+  if (val) form.value = createForm(props.series);
 });
 </script>
