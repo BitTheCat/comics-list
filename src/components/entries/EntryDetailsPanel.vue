@@ -2,8 +2,7 @@
     <aside class="sticky top-4 hidden min-h-64 rounded-box border border-base-content/10 bg-base-100 p-5 md:block">
         <div v-if="entry" class="space-y-5">
             <div>
-                <p class="text-sm text-base-content/60">Entry details</p>
-                <div class="flex justify-between gap-3">
+                <div class="flex justify-between gap-3 bg-amber-500 p-2 rounded-box border border-base-content/10 text-black">
                     <h2 class="text-xl font-bold">
                         {{ entry.title || `Issue #${entry.issue_number}` }}
                     </h2>
@@ -12,14 +11,14 @@
                         <DeleteButton
                             v-if="entry.id"
                             class="btn btn-sm"
-                            @click="emit('delete', entry)"
+                            @delete="emit('delete', entry)"
                         />
                     </div>
                 </div>
             </div>
 
-            <div class="flex justify-between gap-10">
-                <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            <div class="flex items-start justify-between gap-10 mb-0">
+                <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm text-left">
                     <dt class="font-semibold">Issue</dt>
                     <dd>#{{ entry.issue_number }}</dd>
                     <dt class="font-semibold">Title</dt>
@@ -28,7 +27,10 @@
                     <dd>{{ publication }}</dd>
                     <dt class="font-semibold">Cover</dt>
                     <dd>{{ entry.cover_path ? "Available" : "Not available" }}</dd>
+                    <dt class="font-semibold">Condition</dt>
+                    <dd>{{ entry.condition || "—" }}</dd>    
                 </dl>
+                
     
                 <div>
                     <img
@@ -40,17 +42,14 @@
                     />
                 </div>
             </div>
-
             <div v-if="entry.tags.length">
                 <p class="mb-2 text-sm font-semibold">Tags</p>
                 <div class="flex flex-wrap gap-2">
-                    <span
+                    <Badge
                         v-for="tag in entry.tags"
                         :key="tag"
-                        class="badge badge-outline"
-                    >
-                        {{ tag }}
-                    </span>
+                        :label="tag"
+                    />
                 </div>
             </div>
         </div>
@@ -63,9 +62,9 @@
 
 <script setup lang="ts">
 import type { Entry } from "../../types";
+import Badge from "../Badge.vue";
 import DeleteButton from "../DeleteButton.vue";
 import EditButton from "../EditButton.vue";
-import ViewButton from "../ViewButton.vue";
 
 withDefaults(defineProps<{
     entry?: Entry | null;

@@ -31,7 +31,7 @@
                             @click="openCoverModal(item as Entry)"
                         />
                         <EditButton @click="openEdit(item as Entry)" />
-                        <DeleteButton @click="deleteElement(item.id)" />
+                        <DeleteButton @delete="deleteElement(item.id)" />
                     </div>
                 </template>
             </Table>
@@ -82,6 +82,7 @@ import EntryDetailsPanel from "../components/entries/EntryDetailsPanel.vue";
 import Modal from "../components/Modal.vue";
 import Table from "../components/Table.vue";
 import ViewButton from "../components/ViewButton.vue";
+import { useToast } from "../composables/useToast";
 
 const props = withDefaults(defineProps<{
     id?: string | null;
@@ -99,11 +100,13 @@ const editItem = ref<Entry | null>(null);
 const selectedEntry = ref<Entry | null>(null);
 const showCoverModal = ref(false);
 const coverItem = ref<Entry | null>(null);
+const { showToast } = useToast();
 
 const fields = [
-    { key: "issue_number", label: "#" },
+    { key: "issue_number", label: "#", thClass: "w-1/12" },
     { key: "title", label: "Title" },
     { key: "year", label: "Publication" },
+    { key: "condition", label: "Condition", tdClass: "w-1/12" },
     {
         key: "actions",
         label: "",
@@ -182,9 +185,15 @@ const onCreated = async () => {
 };
 
 const deleteElement = async (id: string) => {
-    await api.deleteEntry(id);
-    if (selectedEntry.value?.id === id) selectedEntry.value = null;
-    await fetchEntries();
+    try {
+        await api.deleteEntry(id);
+        if (selectedEntry.value?.id === id) selectedEntry.value = null;
+        await fetchEntries();
+        showToast("Entry deleted successfully", "success");
+    } catch (error) {
+        console.error(error);
+        showToast("Failed to delete entry", "error");
+    }
 };
 
 const deleteEntry = async (entry: Entry) => {

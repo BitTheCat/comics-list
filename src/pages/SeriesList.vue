@@ -13,7 +13,7 @@
           <div class="flex gap-2">
                 <EditButton @click="openEdit(item)"/>
                 <ViewButton @click="viewDetails(item.id)" />
-                <DeleteButton :disabled="item.entries_count > 0" @click="deleteSeries(item.id)" />
+                <DeleteButton :disabled="item.entries_count > 0" @delete="deleteSeries(item.id)" />
           </div>
           </template>
       </Table>
@@ -32,12 +32,14 @@ import ViewButton from '../components/ViewButton.vue';
 import DeleteButton from '../components/DeleteButton.vue';
 import type { Series } from '../types';
 import type { PaginatedResponse, SeriesResource } from '../mocks/api';
+import { useToast } from '../composables/useToast';
 
 
 const router = useRouter();
 
 const showModal = ref(false);
 const editItem = ref<Series | null>(null);
+const { showToast } = useToast();
 
 const fields = ref([
   {
@@ -109,8 +111,10 @@ const deleteSeries = async (id: string | number) => {
   try {
     await api.deleteSeries({ id });
     await refreshSeries();
+    showToast('Series deleted successfully', 'success');
   } catch (e) {
     console.error(e);
+    showToast('Failed to delete series', 'error');
   }
 };
 

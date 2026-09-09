@@ -13,8 +13,8 @@
         {{ placeholder }}
       </option>
       <option
-        v-for="option in options"
-        :key="getOptionValue(option)"
+        v-for="(option, index) in options"
+        :key="getOptionKey(option, index)"
         :value="getOptionValue(option)"
         :disabled="getOptionDisabled(option)"
       >
@@ -73,4 +73,9 @@ const getOptionLabel = (option: SelectOption): string =>
 
 const getOptionDisabled = (option: SelectOption): boolean =>
   isOptionObject(option) && Boolean(option.disabled);
+
+const getOptionKey = (option: SelectOption, index: number): string | number => {
+  const value = getOptionValue(option);
+  return value == null ? `option-${index}` : `${value}-${index}`;
+};
 </script>

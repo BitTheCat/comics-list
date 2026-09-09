@@ -1,6 +1,6 @@
 <template>
-  <fieldset class="fieldset">
-    <legend v-if="label" class="fieldset-legend">{{ label }}</legend>
+  <label class="form-group">
+    <span v-if="label" class="label">{{ label }}</span>
     <input
       ref="fileInput"
       :id="inputId"
@@ -22,7 +22,7 @@
         {{ removeLabel }}
       </button>
     </div>
-  </fieldset>
+  </label>
 </template>
 
 <script setup lang="ts">

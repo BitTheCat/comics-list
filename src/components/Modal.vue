@@ -9,7 +9,13 @@
         <button class="btn" type="button" @click="close">
           {{ cancelLabel }}
         </button>
-        <button v-if="showSubmit" class="btn" type="button" @click="submit">
+        <button
+          v-if="showSubmit"
+          class="btn"
+          :class="isDelete ? 'btn-error' : 'btn-info'"
+          type="button"
+          @click="submit"
+        >
           {{ submitLabel }}
         </button>
       </div>
@@ -26,11 +32,13 @@ const props = withDefaults(defineProps<{
   submitLabel?: string;
   showSubmit?: boolean;
   cancelLabel?: string;
+  isDelete?: boolean;
 }>(), {
   modelValue: false,
   submitLabel: 'Save',
   showSubmit: true,
   cancelLabel: 'Cancel',
+  isDelete: false,
 });
 
 const modelValue = toRef(props, 'modelValue');

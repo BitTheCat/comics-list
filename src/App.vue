@@ -15,12 +15,14 @@
     </header>
 
     <RouterView />
+    <ToastContainer />
   </div>
 </template>
 
 <script lang="ts" setup>
   import { Sun, Moon } from '@lucide/vue';
   import { ref } from 'vue';
+  import ToastContainer from './components/ToastContainer.vue';
 
   const theme = ref('light');
   

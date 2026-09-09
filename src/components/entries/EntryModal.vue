@@ -7,18 +7,18 @@
     @update:model-value="emit('update:modelValue', $event)"
   >
     <form @submit.prevent="createOrUpdate">
-        <input
+        <Input
           id="entry-issue-number"
           v-model="form.issue_number"
-          class="input w-full"
           name="issue_number"
+          label="Issue number"
           placeholder="New entry number #"
         />
-        <input
+        <Input
           id="entry-title"
           v-model="form.title"
-          class="input w-full"
           name="title"
+          label="Title"
           placeholder="Title"
         />
         <YearSelect
@@ -27,11 +27,14 @@
           label="Publication year"
           name="pub_year"
         />
-        <input
+        <Input
           id="entry-publication-month"
-          v-model.number="form.pub_month"
-          class="input w-full"
+          v-model="form.pub_month"
+          type="number"
           name="pub_month"
+          label="Publication month"
+          min="1"
+          max="12"
           placeholder="Publication month"
         />
 
@@ -43,6 +46,15 @@
           label="Cover image"
           preview-alt="Cover preview"
           remove-label="Remove cover"
+        />
+
+        <Select
+          v-model="form.condition"
+          :options="conditionOptions"
+          class="mt-3"
+          input-id="entry-condition"
+          name="condition"
+          label="Condition"
         />
 
         <TagsInput
@@ -57,13 +69,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRef, watch } from 'vue';
+import { computed, ref, toRef, watch } from 'vue';
 import { api } from '../../api';
+import { COMIC_CONDITIONS } from '../../types';
 import type { Entry } from '../../types';
 import ImageInput from '../ImageInput.vue';
 import Modal from '../Modal.vue';
 import TagsInput from '../TagsInput.vue';
 import YearSelect from '../YearSelect.vue';
+import Select from '../Select.vue';
+import { useToast } from '../../composables/useToast';
+import Input from '../Input.vue';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
@@ -94,6 +110,7 @@ const createForm = (entry?: Entry | null): Entry => ({
 });
 
 const form = ref<Entry>(createForm(props.entry));
+const { showToast } = useToast();
 
 watch(modelValue, (val) => {
   if (val) form.value = createForm(props.entry);
@@ -103,21 +120,29 @@ const create = async () => {
   if (!form.value) return;
   try {
     await api.createEntry(form.value);
+    showToast('Entry created successfully', 'success');
     emit('created');
     emit('update:modelValue', false);
   } catch (e) {
     console.error(e);
+    showToast('Failed to create entry', 'error');
   }
 };
+
+const conditionOptions = computed(() => {
+  return COMIC_CONDITIONS.map((c) => ({ value: c, label: c }));
+});
 
 const update = async () => {
   if (!form.value.id) return;
   try {
     await api.updateEntry(form.value.id, form.value);
+    showToast('Entry updated successfully', 'success');
     emit('created');
     emit('update:modelValue', false);
   } catch (e) {
     console.error(e);
+    showToast('Failed to update entry', 'error');
   }
 };
 

@@ -7,21 +7,19 @@
     @update:model-value="emit('update:modelValue', $event)"
   >
     <form @submit.prevent="createOrUpdate">
+        <Input
+          id="series-title"
+          v-model="form.title"
+          name="title"
+          label="Title"
+          placeholder="New series title"
+        />
         <div class="form-group">
-          <input
-                      id="series-title"
-                      v-model="form.title"
-                      class="input w-full"
-                      name="title"
-                      placeholder="New series title"
-                    />
-        </div>
-        <div class="form-group">
-          <input
+          <Input
             id="series-publisher"
             v-model="form.publisher_name"
-            class="input w-full"
             name="publisher_name"
+            label="Publisher"
             list="publisher-options"
             placeholder="Publisher"
             @input="searchPublishers"
@@ -70,6 +68,8 @@ import { api } from '../../api';
 import type { Publisher, Series } from '../../types';
 import Modal from '../Modal.vue';
 import YearSelect from '../YearSelect.vue';
+import Input from '../Input.vue';
+import { useToast } from '../../composables/useToast';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
@@ -107,6 +107,7 @@ const createForm = (series?: Series | null): Form => ({
 });
 
 const form = ref<Form>(createForm(props.series));
+const { showToast } = useToast();
 
 
 const publisherSuggestions = ref<Publisher[]>([]);
@@ -130,10 +131,12 @@ const create = async () => {
       publisher_id: publisher.id,
     });
     publisherSuggestions.value = [];
+    showToast('Series created successfully', 'success');
     emit('created');
     emit('update:modelValue', false);
   } catch (e) {
     console.error(e);
+    showToast('Failed to create series', 'error');
   }
 };
 
@@ -146,10 +149,12 @@ const update = async () => {
       publisher_id: publisher.id,
     });
     publisherSuggestions.value = [];
+    showToast('Series updated successfully', 'success');
     emit('created');
     emit('update:modelValue', false);
   } catch (e) {
     console.error(e);
+    showToast('Failed to update series', 'error');
   }
 };
 

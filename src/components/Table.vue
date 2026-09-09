@@ -13,6 +13,11 @@
                 </tr>
             </thead>
             <tbody>
+                <tr v-if="!hasItems">
+                    <td :colspan="fields.length" class="text-center text-base-content/60">
+                        Empty list
+                    </td>
+                </tr>
                 <tr
                     v-for="item in items"
                     :key="item.id"
@@ -61,6 +66,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import { computed } from "vue";
 import type { PaginationMeta } from "../mocks/api";
 
 interface Field {
@@ -99,6 +105,8 @@ const getValue = (obj: any, path?: string) => {
         obj,
     );
 };
+
+const hasItems = computed<boolean>(() => props.items.length > 0);
 
 const summaryText = () => {
     if (!props.pagination) return "";
