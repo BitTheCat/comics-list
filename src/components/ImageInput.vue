@@ -1,6 +1,6 @@
 <template>
   <label class="form-group">
-    <span v-if="label" class="label">{{ label }}</span>
+    <span v-if="resolvedLabel" class="label">{{ resolvedLabel }}</span>
     <input
       ref="fileInput"
       :id="inputId"
@@ -15,11 +15,11 @@
     <div v-if="modelValue" class="mt-2 flex items-start gap-3">
       <img
         :src="modelValue"
-        :alt="previewAlt"
+        :alt="resolvedPreviewAlt"
         class="h-40 w-28 rounded object-cover shadow"
       />
       <button class="btn btn-sm" type="button" @click="removeImage">
-        {{ removeLabel }}
+        {{ resolvedRemoveLabel }}
       </button>
     </div>
   </label>
@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { useI18n } from '../i18n/useI18n';
 
 const props = withDefaults(defineProps<{
   modelValue?: string | null;
@@ -41,11 +42,11 @@ const props = withDefaults(defineProps<{
   modelValue: null,
   inputId: undefined,
   name: 'image',
-  label: 'Image',
+  label: undefined,
   accept: 'image/*',
   maxSizeMb: 5,
-  previewAlt: 'Image preview',
-  removeLabel: 'Remove image',
+  previewAlt: undefined,
+  removeLabel: undefined,
 });
 
 const emit = defineEmits<{
@@ -54,9 +55,11 @@ const emit = defineEmits<{
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const error = ref('');
-const helpText = computed(
-  () => `PNG, JPEG, WebP or GIF, up to ${props.maxSizeMb} MB.`,
-);
+const { t } = useI18n();
+const resolvedLabel = computed(() => props.label ?? t('image_input_label'));
+const resolvedPreviewAlt = computed(() => props.previewAlt ?? t('image_input_preview_alt'));
+const resolvedRemoveLabel = computed(() => props.removeLabel ?? t('image_input_remove'));
+const helpText = computed(() => t('image_input_help', { maxSize: props.maxSizeMb }));
 
 const onFileSelected = (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -65,12 +68,12 @@ const onFileSelected = (event: Event) => {
 
   if (!file) return;
   if (!file.type.startsWith('image/')) {
-    error.value = 'Select a valid image file.';
+    error.value = t('image_input_invalid_file');
     input.value = '';
     return;
   }
   if (file.size > props.maxSizeMb * 1024 * 1024) {
-    error.value = `The image must be smaller than ${props.maxSizeMb} MB.`;
+    error.value = t('image_input_too_large', { maxSize: props.maxSizeMb });
     input.value = '';
     return;
   }
@@ -80,7 +83,7 @@ const onFileSelected = (event: Event) => {
     if (typeof reader.result === 'string') emit('update:modelValue', reader.result);
   };
   reader.onerror = () => {
-    error.value = 'The image could not be read.';
+    error.value = t('image_input_read_error');
   };
   reader.readAsDataURL(file);
 };

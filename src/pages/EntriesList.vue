@@ -1,11 +1,11 @@
 <template>
     <div class="flex gap-2">
-        <RouterLink class="btn btn-sm" to="/series">Back to series</RouterLink>
-        <button class="btn btn-sm" :disabled="!seriesId" @click="openCreate">Add number</button>
+        <RouterLink class="btn btn-sm" to="/series">{{ t('entries_back_to_series') }}</RouterLink>
+        <button class="btn btn-sm" :disabled="!seriesId" @click="openCreate">{{ t('entries_add_number') }}</button>
     </div>
 
     <div v-if="!props.id">
-        <p>Select a work/series to see entries. (Placeholder)</p>
+        <p>{{ t('entries_select_series_placeholder') }}</p>
     </div>
 
     <div v-else class="grid items-start gap-4 md:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)]">
@@ -55,9 +55,9 @@
     />
     <Modal
         v-model="showCoverModal"
-        :title="`Cover: ${coverItem?.issue_number}`"
+        :title="t('entries_cover_title', { issue: coverItem?.issue_number ?? '' })"
         :show-submit="false"
-        cancel-label="Close"
+        :cancel-label="t('common_close')"
     >
         <div class="flex justify-center">
             <img
@@ -83,6 +83,7 @@ import Modal from "../components/Modal.vue";
 import Table from "../components/Table.vue";
 import ViewButton from "../components/ViewButton.vue";
 import { useToast } from "../composables/useToast";
+import { useI18n } from '../i18n/useI18n';
 
 const props = withDefaults(defineProps<{
     id?: string | null;
@@ -101,19 +102,20 @@ const selectedEntry = ref<Entry | null>(null);
 const showCoverModal = ref(false);
 const coverItem = ref<Entry | null>(null);
 const { showToast } = useToast();
+const { t, locale } = useI18n();
 
-const fields = [
+const fields = computed(() => [
     { key: "issue_number", label: "#", thClass: "w-1/12" },
-    { key: "title", label: "Title" },
-    { key: "year", label: "Publication" },
-    { key: "condition", label: "Condition", tdClass: "w-1/12" },
+    { key: "title", label: t('entries_field_title') },
+    { key: "year", label: t('entries_field_publication') },
+    { key: "condition", label: t('entries_field_condition'), tdClass: "w-1/12" },
     {
         key: "actions",
         label: "",
         thClass: "md:hidden",
         tdClass: "md:hidden",
     },
-];
+]);
 
 const entries = ref<PaginatedResponse<Entry>>({
     items: [],
@@ -125,11 +127,13 @@ const entries = ref<PaginatedResponse<Entry>>({
     },
 });
 
-const monthFormatter = new Intl.DateTimeFormat("it-IT", { month: "long" });
+const monthFormatter = computed(() =>
+    new Intl.DateTimeFormat(locale.value === 'it' ? 'it-IT' : 'en-US', { month: "long" }),
+);
 
 const formatMonth = (month: number | null): string | null => {
     if (month == null || month < 1 || month > 12) return null;
-    const formattedMonth = monthFormatter.format(new Date(2000, month - 1, 1));
+    const formattedMonth = monthFormatter.value.format(new Date(2000, month - 1, 1));
     return formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
 };
 
@@ -189,10 +193,10 @@ const deleteElement = async (id: string) => {
         await api.deleteEntry(id);
         if (selectedEntry.value?.id === id) selectedEntry.value = null;
         await fetchEntries();
-        showToast("Entry deleted successfully", "success");
+        showToast(t('entry_toast_delete_success'), "success");
     } catch (error) {
         console.error(error);
-        showToast("Failed to delete entry", "error");
+        showToast(t('entry_toast_delete_error'), "error");
     }
 };
 

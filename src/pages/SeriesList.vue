@@ -1,7 +1,7 @@
 <template>
   <div>
       <div class="flex gap-4">
-          <button class="btn  btn-sm" @click="showModal = true">Add Series</button>
+          <button class="btn  btn-sm" @click="showModal = true">{{ t('series_add') }}</button>
       </div>
       <Table 
         :items="series.items" 
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts" >
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Table from '../components/Table.vue';
 import SeriesModal from '../components/series/SeriesModal.vue';
 import { api } from '../api';
@@ -33,6 +33,7 @@ import DeleteButton from '../components/DeleteButton.vue';
 import type { Series } from '../types';
 import type { PaginatedResponse, SeriesResource } from '../mocks/api';
 import { useToast } from '../composables/useToast';
+import { useI18n } from '../i18n/useI18n';
 
 
 const router = useRouter();
@@ -40,34 +41,35 @@ const router = useRouter();
 const showModal = ref(false);
 const editItem = ref<Series | null>(null);
 const { showToast } = useToast();
+const { t } = useI18n();
 
-const fields = ref([
+const fields = computed(() => ([
   {
     key: 'title',
-    label: 'Title',
+    label: t('series_field_title'),
   },
   {
     key: 'description',
-    label: 'Description',
+    label: t('series_field_description'),
   },
   {
     key: 'publisher.name',
-    label: 'Publisher',
+    label: t('series_field_publisher'),
   },
   {
     key: 'start_year',
-    label: 'Year',
+    label: t('series_field_year'),
   },
   {
     key: 'entries_count',
-    label: 'Numbers',
+    label: t('series_field_numbers'),
   },
   {
     key: 'actions',
     label: '',
     tdClass: 'flex justify-end',
   },
-]);
+]));
 
 const series = ref<PaginatedResponse<SeriesResource>>({
   items: [],
@@ -111,10 +113,10 @@ const deleteSeries = async (id: string | number) => {
   try {
     await api.deleteSeries({ id });
     await refreshSeries();
-    showToast('Series deleted successfully', 'success');
+    showToast(t('series_toast_delete_success'), 'success');
   } catch (e) {
     console.error(e);
-    showToast('Failed to delete series', 'error');
+    showToast(t('series_toast_delete_error'), 'error');
   }
 };
 

@@ -19,15 +19,15 @@
 
             <div class="flex items-start justify-between gap-10 mb-0">
                 <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm text-left">
-                    <dt class="font-semibold">Issue</dt>
+                    <dt class="font-semibold">{{ t('entry_details_issue') }}</dt>
                     <dd>#{{ entry.issue_number }}</dd>
-                    <dt class="font-semibold">Title</dt>
+                    <dt class="font-semibold">{{ t('entry_details_title') }}</dt>
                     <dd>{{ entry.title || "—" }}</dd>
-                    <dt class="font-semibold">Publication</dt>
+                    <dt class="font-semibold">{{ t('entry_details_publication') }}</dt>
                     <dd>{{ publication }}</dd>
-                    <dt class="font-semibold">Cover</dt>
-                    <dd>{{ entry.cover_path ? "Available" : "Not available" }}</dd>
-                    <dt class="font-semibold">Condition</dt>
+                    <dt class="font-semibold">{{ t('entry_details_cover') }}</dt>
+                    <dd>{{ entry.cover_path ? t('entry_details_cover_available') : t('entry_details_cover_not_available') }}</dd>
+                    <dt class="font-semibold">{{ t('entry_details_condition') }}</dt>
                     <dd>{{ entry.condition || "—" }}</dd>    
                 </dl>
                 
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div v-if="entry.tags.length">
-                <p class="mb-2 text-sm font-semibold">Tags</p>
+                <p class="mb-2 text-sm font-semibold">{{ t('entry_details_tags') }}</p>
                 <div class="flex flex-wrap gap-2">
                     <Badge
                         v-for="tag in entry.tags"
@@ -55,7 +55,7 @@
         </div>
 
         <div v-else class="flex min-h-54 items-center justify-center text-center text-base-content/50">
-            <p>Select an entry from the table to preview its details.</p>
+            <p>{{ t('entry_details_empty') }}</p>
         </div>
     </aside>
 </template>
@@ -65,6 +65,7 @@ import type { Entry } from "../../types";
 import Badge from "../Badge.vue";
 import DeleteButton from "../DeleteButton.vue";
 import EditButton from "../EditButton.vue";
+import { useI18n } from '../../i18n/useI18n';
 
 withDefaults(defineProps<{
     entry?: Entry | null;
@@ -73,6 +74,8 @@ withDefaults(defineProps<{
     entry: null,
     publication: "—",
 });
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
     (e: "view", entry: Entry): void;

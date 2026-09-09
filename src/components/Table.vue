@@ -15,7 +15,7 @@
             <tbody>
                 <tr v-if="!hasItems">
                     <td :colspan="fields.length" class="text-center text-base-content/60">
-                        Empty list
+                        {{ t('table_empty') }}
                     </td>
                 </tr>
                 <tr
@@ -68,6 +68,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import type { PaginationMeta } from "../mocks/api";
+import { useI18n } from '../i18n/useI18n';
 
 interface Field {
     key: string;
@@ -107,9 +108,13 @@ const getValue = (obj: any, path?: string) => {
 };
 
 const hasItems = computed<boolean>(() => props.items.length > 0);
+const { t } = useI18n();
 
 const summaryText = () => {
     if (!props.pagination) return "";
-    return `Page ${props.pagination.page} of ${props.pagination.total_pages}`;
+    return t('table_page_of', {
+        page: props.pagination.page,
+        total: props.pagination.total_pages,
+    });
 };
 </script>

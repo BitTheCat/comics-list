@@ -1,22 +1,22 @@
 <template>
   <div v-if="modelValue" class="modal modal-open" @click="close">
     <div class="modal-box" @click.stop>
-      <h3 class="text-lg font-bold">{{ title }}</h3>
+      <h3 v-if="title" class="text-lg font-bold">{{ title }}</h3>
 
       <slot />
 
       <div class="modal-action">
         <button class="btn" type="button" @click="close">
-          {{ cancelLabel }}
+          {{ resolvedCancelLabel }}
         </button>
         <button
           v-if="showSubmit"
           class="btn"
-          :class="isDelete ? 'btn-error' : 'btn-info'"
+          :class="isDelete ? 'btn-error' : 'btn-warning'"
           type="button"
           @click="submit"
         >
-          {{ submitLabel }}
+          {{ resolvedSubmitLabel }}
         </button>
       </div>
     </div>
@@ -24,7 +24,8 @@
 </template>
 
 <script lang="ts" setup>
-import { toRef, watch, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount, toRef, watch } from 'vue';
+import { useI18n } from '../i18n/useI18n';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
@@ -35,13 +36,19 @@ const props = withDefaults(defineProps<{
   isDelete?: boolean;
 }>(), {
   modelValue: false,
-  submitLabel: 'Save',
+  submitLabel: undefined,
   showSubmit: true,
-  cancelLabel: 'Cancel',
+  cancelLabel: undefined,
   isDelete: false,
 });
 
 const modelValue = toRef(props, 'modelValue');
+const { t } = useI18n();
+
+const resolvedCancelLabel = computed(() => props.cancelLabel ?? t('common_cancel'));
+const resolvedSubmitLabel = computed(() =>
+  props.submitLabel ?? (props.isDelete ? t('common_delete') : t('common_update')),
+);
 
 const emit = defineEmits<{
   (e: 'submit'): void;
