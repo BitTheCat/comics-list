@@ -14,13 +14,70 @@ export const api = {
     if (isTauri) return invokeTauri('api_list_series');
     return mock.getSeries();
   },
+  listSeriesPaginated: (request: mock.PaginationRequest = {}) => {
+    if (isTauri) return invokeTauri('api_list_series_paginated', { request });
+    return mock.getSeriesPaginated(request);
+  },
   createSeries: (p: any) => {
     if (isTauri) return invokeTauri('api_create_series', { payload: p });
     return mock.createSeries(p);
   },
-  getEntries: (seriesId: string) => {
+  updateSeries: (p: any) => {
+    if (isTauri) return Promise.reject(new Error('Updating series is not supported in Tauri yet'));
+    return mock.updateSeries(p);
+  },
+  deleteSeries: (p: any) => {
+    if (isTauri) return Promise.reject(new Error('Deleting series is not supported in Tauri yet'));
+    return mock.deleteSeries(p);
+  },
+  listPublishers: (query = '') => {
+    if (isTauri) return invokeTauri('api_list_publishers', { query });
+    return mock.getPublishers(query);
+  },
+  getPublisher: (id: string) => {
+    if (isTauri) return invokeTauri('api_get_publisher', { id });
+    return mock.getPublisher(id);
+  },
+  createPublisher: (payload: { name: string; notes?: string | null }) => {
+    if (isTauri) return invokeTauri('api_create_publisher', { payload });
+    return mock.createPublisher(payload);
+  },
+  findOrCreatePublisher: async (name: string) => {
+    const normalizedName = name.trim();
+    if (!normalizedName) throw new Error('Publisher name is required');
+
+    const publishers = await api.listPublishers(normalizedName) as mock.Publisher[];
+    const exactMatch = publishers.find(
+      (publisher) =>
+        publisher.name.toLocaleLowerCase() === normalizedName.toLocaleLowerCase(),
+    );
+
+    return exactMatch ?? api.createPublisher({ name: normalizedName });
+  },
+  getEntries: (seriesId: number) => {
     if (isTauri) return invokeTauri('api_list_entries', { seriesId });
     return mock.getEntries(seriesId);
+  },
+  listEntriesPaginated: (
+    seriesId: number,
+    request: mock.PaginationRequest = {},
+  ) => {
+    if (isTauri) {
+      return invokeTauri('api_list_entries_paginated', { seriesId, request });
+    }
+    return mock.getEntriesPaginated(seriesId, request);
+  },
+  createEntry: (payload: any) => {
+    if (isTauri) return invokeTauri('api_create_entry', { payload });
+    return import('../mocks/api_entries').then((m) => m.createEntry(payload));
+  },
+  updateEntry: (id: string, payload: any) => {
+    if (isTauri) return invokeTauri('api_update_entry', { id, payload });
+    return import('../mocks/api_entries').then((m) => m.updateEntry(id, payload));
+  },
+  deleteEntry: (id: string) => {
+    if (isTauri) return invokeTauri('api_delete_entry', { id });
+    return import('../mocks/api_entries').then((m) => m.deleteEntry(id));
   },
 };
 

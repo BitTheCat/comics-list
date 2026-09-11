@@ -1,8 +1,28 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+@layer base {
+    form {
+        @apply space-y-4;
+    }
+
+    button:not(:disabled) {
+        cursor: pointer;
+    }
+
+    button:disabled {
+        cursor: not-allowed;
+    }
+}
+
 .text-muted {
     color: gray;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 @media (prefers-color-scheme: dark) {

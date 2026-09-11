@@ -2,11 +2,10 @@
 
 mod db;
 
-use db::{create_series, init_db, list_series, SeriesRow};
-use serde::Serialize;
-use tauri::Manager;
-use uuid::Uuid;
 use chrono::Utc;
+use db::{create_series, init_db, list_series, SeriesRow};
+use serde::Deserialize;
+use tauri::Manager;
 
 #[tauri::command]
 fn api_list_series() -> Result<Vec<SeriesRow>, String> {
@@ -14,10 +13,10 @@ fn api_list_series() -> Result<Vec<SeriesRow>, String> {
     list_series(&conn).map_err(|e| format!("db query error: {}", e))
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
 struct CreateSeriesPayload {
     pub title: String,
-    pub series_title: Option<String>,
+    pub description: Option<String>,
     pub publisher_id: Option<String>,
     pub start_year: Option<i32>,
     pub end_year: Option<i32>,
@@ -25,15 +24,13 @@ struct CreateSeriesPayload {
 }
 
 #[tauri::command]
-fn api_create_series(payload: CreateSeriesPayload) -> Result<String, String> {
+fn api_create_series(payload: CreateSeriesPayload) -> Result<i64, String> {
     let conn = init_db().map_err(|e| format!("db init error: {}", e))?;
-    let id = Uuid::new_v4().to_string();
     let now = Utc::now().to_rfc3339();
-    create_series(
+    let id = create_series(
         &conn,
-        &id,
         &payload.title,
-        payload.series_title.as_deref(),
+        payload.description.as_deref(),
         payload.publisher_id.as_deref(),
         payload.start_year,
         payload.end_year,
@@ -58,4 +55,3 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
