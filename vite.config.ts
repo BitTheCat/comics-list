@@ -6,6 +6,9 @@ export default defineConfig({
   plugins: [vue(), tailwindcss()],
   server: {
     port: 5173,
+    watch: {
+      ignored: ['**/src-tauri/target/**'],
+    },
   },
   optimizeDeps: {
     include: ['@tauri-apps/api'],

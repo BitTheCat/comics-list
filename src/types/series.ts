@@ -2,7 +2,6 @@ export interface Series {
   id?: number;
   title: string;
   description: string;
-  publisher_id: string;
   publisher: Publisher;
   start_year: number;
   end_year: number;
@@ -11,6 +10,6 @@ export interface Series {
 }
 
 export interface Publisher {
-  id: string;
+  id: number | string;
   name: string;
 }

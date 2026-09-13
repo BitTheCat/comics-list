@@ -28,7 +28,6 @@ export interface SeriesResource {
   id: number;
   title: string;
   description: string | null;
-  publisher_id: string | null;
   publisher: Publisher | null;
   start_year: number | null;
   end_year: number | null;
@@ -75,7 +74,6 @@ const additionalSeries: StoredSeries[] = [
     id: index + 3,
     title,
     description: `Edizione italiana di ${title}.`,
-    publisher_id: publisher.id,
     publisher,
     start_year: 1985 + (index % 35),
     end_year: index % 4 === 0 ? null : 1995 + (index % 25),
@@ -88,7 +86,6 @@ export const mockSeries: StoredSeries[] = [
     id: 1,
     title: 'Spawn',
     description: 'Prima edizione italiana di Spawn.',
-    publisher_id: 'p1',
     publisher: mockPublishers[0],
     start_year: 1990,
     end_year: 1995,
@@ -98,7 +95,6 @@ export const mockSeries: StoredSeries[] = [
     id: 2,
     title: 'Spawn',
     description: 'Edizione italiana successiva di Spawn.',
-    publisher_id: 'p2',
     publisher: mockPublishers[1],
     start_year: 1996,
     end_year: null,

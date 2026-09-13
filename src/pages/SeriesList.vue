@@ -85,6 +85,7 @@ const loadSeries = async () => {
   try {
     const res = await api.listSeriesPaginated();
     series.value = res as PaginatedResponse<SeriesResource>;
+    console.log('series', series.value)
   } catch (e) {
     console.error(e);
   }
