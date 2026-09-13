@@ -4,7 +4,7 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct EntryRow { 
     pub id: i64,
-    pub series_id: String,
+    pub series_id: i64,
     pub issue_number: String,
     pub title: Option<String>,
     pub pub_year: Option<i32>,

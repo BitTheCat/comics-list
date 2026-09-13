@@ -24,7 +24,7 @@ describe('EntryDetailsPanel', () => {
   });
 
   it('renders entry details and emits its actions', async () => {
-    const { emitted, getByRole, getByText } = render(EntryDetailsPanel, {
+    const { container, emitted, getByRole, getByText } = render(EntryDetailsPanel, {
       props: {
         entry,
         publication: 'Marzo 2024',
@@ -37,7 +37,11 @@ describe('EntryDetailsPanel', () => {
 
     await fireEvent.click(getByRole('img', { name: 'Cover' }));
     await fireEvent.click(getByRole('button', { name: 'Edit' }));
+
     await fireEvent.click(getByRole('button', { name: 'Delete' }));
+    const confirmDeleteButton = Array.from(container.ownerDocument.querySelectorAll('button'))
+      .find((button) => button.textContent?.trim() === 'Delete' && button.className.includes('btn-error')) as HTMLButtonElement;
+    await fireEvent.click(confirmDeleteButton);
 
     expect(emitted().view).toEqual([[entry]]);
     expect(emitted().edit).toEqual([[entry]]);

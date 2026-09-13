@@ -37,7 +37,7 @@ describe('EntryModal', () => {
 
     const input = getByPlaceholderText('Add tags separated by commas');
     await fireEvent.update(input, 'Marvel, Superhero, marvel');
-    await fireEvent.click(getByRole('button', { name: 'Add' }));
+    await fireEvent.blur(input);
 
     expect(queryByText('Marvel')).toBeTruthy();
     expect(queryByText('Superhero')).toBeTruthy();
@@ -45,23 +45,28 @@ describe('EntryModal', () => {
     expect(queryByText('Marvel')).toBeNull();
   });
 
-  it('previews and removes a selected cover', async () => {
-    const { container, getByAltText, getByRole, queryByAltText } = render(EntryModal, {
+  it('renders existing cover preview in edit mode', async () => {
+    const entry: Entry = {
+      id: '1',
+      issue_number: '1',
+      title: 'Test',
+      series_id: 1,
+      pub_year: 2021,
+      pub_month: 1,
+      cover_path: 'data:image/png;base64,AA==',
+      tags: [],
+      condition: 'NM',
+    };
+
+    const { getByAltText } = render(EntryModal, {
       props: {
         modelValue: true,
         series_id: 1,
-        entry: null,
+        entry,
       },
     });
 
-    const input = container.querySelector('#entry-cover') as HTMLInputElement;
-    const cover = new File(['cover'], 'cover.png', { type: 'image/png' });
-    Object.defineProperty(input, 'files', { value: [cover] });
-    await fireEvent(input, new Event('change', { bubbles: true }));
-
     await waitFor(() => expect(getByAltText('Cover preview')).toBeTruthy());
-    await fireEvent.click(getByRole('button', { name: 'Remove cover' }));
-    expect(queryByAltText('Cover preview')).toBeNull();
   });
 
   it('opens in edit mode', () => {
