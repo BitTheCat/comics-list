@@ -29,7 +29,7 @@ pub fn list_entries(conn: &Connection) -> Result<Vec<EntryRow>> {
             e.tags,
             e.condition,
             e.created_at,
-            e.updated_at,
+            e.updated_at
         FROM entries e
         ORDER BY e.issue_number COLLATE NOCASE",
     )?;
@@ -58,7 +58,7 @@ pub fn list_entries(conn: &Connection) -> Result<Vec<EntryRow>> {
 
 pub fn create_entry(
     conn: &Connection,
-    series_id: &str,
+    series_id: &i64,
     issue_number: &str,
     title: Option<&str>,
     pub_year: Option<i32>,

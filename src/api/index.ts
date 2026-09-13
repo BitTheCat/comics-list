@@ -51,12 +51,15 @@ export const api = {
     return mock.deleteSeries(p);
   },
   listPublishers: (query = '') => {
-    if (isTauriRuntime()) return invokeTauri('api_list_publishers');
+    if (isTauriRuntime()) return invokeTauri('api_list_publishers', { name: query });
     return mock.getPublishers(query);
   },
-  getPublisher: (id: string) => {
-    if (isTauriRuntime()) return invokeTauri('api_get_publisher', { id });
-    return mock.getPublisher(id);
+  getPublisher: async (name: string) => {
+    if (isTauriRuntime()) {
+      const matches = await invokeTauri<Array<{ id: number; name: string }>>('api_list_publishers', { name });
+      return matches[0] ?? null;
+    }
+    return mock.getPublisher(name);
   },
   createPublisher: (payload: { name: string; notes?: string | null }) => {
     if (isTauriRuntime()) return invokeTauri<number>('api_create_publisher', { payload });
