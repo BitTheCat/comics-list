@@ -103,3 +103,32 @@ pub fn create_series(
     )?;
     Ok(conn.last_insert_rowid())
 }
+
+pub fn update_series(
+    conn: &Connection,
+    id: Option<i64>,
+    title: &str,
+    description: Option<&str>,
+    publisher_id: Option<i64>,
+    start_year: Option<i32>,
+    end_year: Option<i32>,
+    notes: Option<&str>,
+    now: &str,
+) -> Result<i64> {
+    conn.execute(
+        "UPDATE series SET title = ?1, description = ?2, publisher_id = ?3, start_year = ?4, end_year = ?5, notes = ?6, updated_at = ?7 WHERE id = ?8",
+        params![title, description, publisher_id, start_year, end_year, notes, now, id],
+    )?;
+    Ok(id.unwrap_or(conn.last_insert_rowid()))
+}
+
+pub fn delete_series(
+    conn: &Connection,
+    id: i64,
+) -> Result<bool> {
+    conn.execute(
+        "DELETE FROM series WHERE id = ?1",
+        params![id],
+    )?;
+    Ok(true)
+}

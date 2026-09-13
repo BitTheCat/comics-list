@@ -1,7 +1,8 @@
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-pub struct CreateSeriesPayload {
+pub struct SeriesPayload {
+    pub id: Option<i64>,
     pub title: String,
     pub description: Option<String>,
     pub publisher_id: Option<i64>,

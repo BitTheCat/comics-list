@@ -43,12 +43,12 @@ export const api = {
     return mock.createSeries(p);
   },
   updateSeries: (p: any) => {
-    if (isTauriRuntime()) return Promise.reject(new Error('Updating series is not supported in Tauri yet'));
+    if (isTauriRuntime()) return invokeTauri('api_update_series', { payload: p });
     return mock.updateSeries(p);
   },
-  deleteSeries: (p: any) => {
-    if (isTauriRuntime()) return Promise.reject(new Error('Deleting series is not supported in Tauri yet'));
-    return mock.deleteSeries(p);
+  deleteSeries: (id: number) => {
+    if (isTauriRuntime()) return invokeTauri('api_delete_series', { id });
+    return mock.deleteSeries(id);
   },
   listPublishers: (query = '') => {
     if (isTauriRuntime()) return invokeTauri('api_list_publishers', { name: query });

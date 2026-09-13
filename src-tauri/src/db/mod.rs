@@ -7,6 +7,8 @@ mod publisher;
 pub use connection::init_db;
 pub use series::{
     create_series,
+    update_series,
+    delete_series,
     list_series_paginated,
     SeriesRow,
 };

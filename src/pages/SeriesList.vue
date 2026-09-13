@@ -110,9 +110,9 @@ const openEdit = (series: any) => {
   showModal.value = true;
 };
 
-const deleteSeries = async (id: string | number) => {
+const deleteSeries = async (id: number) => {
   try {
-    await api.deleteSeries({ id });
+    await api.deleteSeries(id as number);
     await refreshSeries();
     showToast(t('series_toast_delete_success'), 'success');
   } catch (e) {
