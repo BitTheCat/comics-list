@@ -3,7 +3,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct CreateEntryPayload {
     pub id: i64,
-    pub series_id: String,
+    pub series_id: i64,
     pub issue_number: String,
     pub title: Option<String>,
     pub pub_year: Option<i32>,
