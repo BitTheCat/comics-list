@@ -17,3 +17,11 @@ pub use publisher::{
     list_publishers,
     PublisherRow,
 };
+pub use entry::{
+    create_entry,
+    update_entry,
+    delete_entry,
+    list_entries_paginated,    
+    EntryRow,
+};
+

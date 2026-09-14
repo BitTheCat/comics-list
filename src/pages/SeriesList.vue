@@ -30,8 +30,7 @@ import { useRouter } from 'vue-router';
 import EditButton from '../components/EditButton.vue';
 import ViewButton from '../components/ViewButton.vue';
 import DeleteButton from '../components/DeleteButton.vue';
-import type { Series } from '../types';
-import type { PaginatedResponse, SeriesResource } from '../mocks/api';
+import type { PaginatedResponse, Series, SeriesResource } from '../types';
 import { useToast } from '../composables/useToast';
 import { useI18n } from '../i18n/useI18n';
 

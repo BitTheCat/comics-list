@@ -1,39 +1,11 @@
 // Mock API for frontend development without Tauri/Rust backend.
 import { COMIC_CONDITIONS } from '../types';
-export interface Publisher {
-  id: string;
-  name: string;
-  notes: string | null;
-}
-
-export interface PaginationRequest {
-  page?: number;
-  page_size?: number;
-  query?: string;
-}
-
-export interface PaginationMeta {
-  page: number;
-  page_size: number;
-  total_items: number;
-  total_pages: number;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  pagination: PaginationMeta;
-}
-
-export interface SeriesResource {
-  id: number;
-  title: string;
-  description: string | null;
-  publisher: Publisher | null;
-  start_year: number | null;
-  end_year: number | null;
-  notes: string | null;
-  entries_count: number;
-}
+import type {
+  PaginatedResponse,
+  PaginationRequest,
+  Publisher,
+  SeriesResource,
+} from '../types';
 
 type StoredSeries = Omit<SeriesResource, 'entries_count'>;
 

@@ -75,6 +75,15 @@ pub fn run_migrations(conn: &Connection) -> Result<()> {
                     || !series_publisher_id_type.eq_ignore_ascii_case("INTEGER"))
             },
         },
+        Migration {
+            version: 8,
+            name: "use integer entry identifiers",
+            sql: include_str!("../../migrations/0008_integer_entries_ids.sql"),
+            should_run: |connection| {
+                let entries_id_type = column_type(connection, "entries", "id")?;
+                Ok(!entries_id_type.eq_ignore_ascii_case("INTEGER"))
+            },
+        },
     ];
 
     for migration in migrations {

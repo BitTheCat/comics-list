@@ -101,7 +101,7 @@ const createForm = (series?: Series | null): Form => ({
   id: series?.id,
   title: series?.title ?? '',
   description: series?.description ?? '',
-  publisher_name: series?.publisher.name ?? null,
+  publisher_name: series?.publisher?.name ?? null,
   start_year: series?.start_year ?? null,
   end_year: series?.end_year ?? null,
   notes: series?.notes ?? '',

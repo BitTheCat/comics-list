@@ -1,15 +1,21 @@
+import { PaginationRequest } from './pagination';
+import type { Publisher } from './publisher';
+
 export interface Series {
   id?: number;
   title: string;
-  description: string;
-  publisher: Publisher;
-  start_year: number;
-  end_year: number;
-  notes: string;
-  entries_count?: number;
+  description: string | null;
+  publisher: Publisher | null;
+  start_year: number | null;
+  end_year: number | null;
+  notes: string | null;
 }
 
-export interface Publisher {
-  id: number | string;
-  name: string;
+export interface SeriesResource extends Series {
+  id: number;
+  entries_count: number;
+}
+
+export interface ListEntriesRequest extends PaginationRequest {
+  series_id: number;
 }

@@ -14,8 +14,8 @@ export async function getEntries(seriesId: number) {
   return new Promise((resolve) => setTimeout(() => resolve(list), 50));
 }
 
-export async function updateEntry(id: string, payload: any) {
-  const idx = mockEntries.findIndex((e: any) => e.id === id);
+export async function updateEntry(payload: any) {
+  const idx = mockEntries.findIndex((e: any) => e.id === payload.id);
   if (idx !== -1) {
     mockEntries[idx] = { ...mockEntries[idx], ...payload };
     return new Promise((resolve) => setTimeout(() => resolve(mockEntries[idx]), 50));
@@ -23,7 +23,7 @@ export async function updateEntry(id: string, payload: any) {
   return new Promise((_, reject) => setTimeout(() => reject(new Error('not found')), 50));
 }
 
-export async function deleteEntry(id: string) {
+export async function deleteEntry(id: number) {
   const idx = mockEntries.findIndex((e: any) => e.id === id);
   if (idx !== -1) {
     const removed = mockEntries.splice(idx, 1)[0];
