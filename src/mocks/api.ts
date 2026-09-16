@@ -1,40 +1,11 @@
 // Mock API for frontend development without Tauri/Rust backend.
 import { COMIC_CONDITIONS } from '../types';
-export interface Publisher {
-  id: string;
-  name: string;
-  notes: string | null;
-}
-
-export interface PaginationRequest {
-  page?: number;
-  page_size?: number;
-  query?: string;
-}
-
-export interface PaginationMeta {
-  page: number;
-  page_size: number;
-  total_items: number;
-  total_pages: number;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  pagination: PaginationMeta;
-}
-
-export interface SeriesResource {
-  id: number;
-  title: string;
-  description: string | null;
-  publisher_id: string | null;
-  publisher: Publisher | null;
-  start_year: number | null;
-  end_year: number | null;
-  notes: string | null;
-  entries_count: number;
-}
+import type {
+  PaginatedResponse,
+  PaginationRequest,
+  Publisher,
+  SeriesResource,
+} from '../types';
 
 type StoredSeries = Omit<SeriesResource, 'entries_count'>;
 
@@ -75,7 +46,6 @@ const additionalSeries: StoredSeries[] = [
     id: index + 3,
     title,
     description: `Edizione italiana di ${title}.`,
-    publisher_id: publisher.id,
     publisher,
     start_year: 1985 + (index % 35),
     end_year: index % 4 === 0 ? null : 1995 + (index % 25),
@@ -88,7 +58,6 @@ export const mockSeries: StoredSeries[] = [
     id: 1,
     title: 'Spawn',
     description: 'Prima edizione italiana di Spawn.',
-    publisher_id: 'p1',
     publisher: mockPublishers[0],
     start_year: 1990,
     end_year: 1995,
@@ -98,7 +67,6 @@ export const mockSeries: StoredSeries[] = [
     id: 2,
     title: 'Spawn',
     description: 'Edizione italiana successiva di Spawn.',
-    publisher_id: 'p2',
     publisher: mockPublishers[1],
     start_year: 1996,
     end_year: null,
@@ -277,11 +245,11 @@ export async function updateSeries(payload: any) {
   return new Promise(resolve => setTimeout(() => resolve(payload.id), 50));
 }
 
-export async function deleteSeries(payload: any) {
-  const index = mockSeries.findIndex((item) => item.id === payload.id);
+export async function deleteSeries(id: number) {
+  const index = mockSeries.findIndex((item) => item.id === id);
   if (index === -1) throw new Error('Series not found');
   mockSeries.splice(index, 1);
-  return new Promise(resolve => setTimeout(() => resolve(payload.id), 50));
+  return new Promise(resolve => setTimeout(() => resolve(id), 50));
 }
 
 

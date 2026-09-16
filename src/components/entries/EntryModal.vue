@@ -27,14 +27,13 @@
           :label="t('entry_modal_publication_year')"
           name="pub_year"
         />
-        <Input
-          id="entry-publication-month"
+        <Select
           v-model="form.pub_month"
-          type="number"
+          :options="monthOptions"
+          class="mt-3"
+          input-id="entry-publication-month"
           name="pub_month"
           :label="t('entry_modal_publication_month')"
-          min="1"
-          max="12"
           :placeholder="t('entry_modal_publication_month')"
         />
 
@@ -72,7 +71,7 @@
 import { computed, ref, toRef, watch } from 'vue';
 import { api } from '../../api';
 import { COMIC_CONDITIONS } from '../../types';
-import type { Entry } from '../../types';
+import type { ComicCondition, Entry } from '../../types';
 import ImageInput from '../ImageInput.vue';
 import Modal from '../Modal.vue';
 import TagsInput from '../TagsInput.vue';
@@ -98,30 +97,54 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
 }>();
 
-const createForm = (entry?: Entry | null): Entry => ({
+type EntryForm = {
+  id?: number;
+  issue_number: string;
+  series_id: number;
+  title: string;
+  pub_year: number | null;
+  pub_month: string | null;
+  cover_path: string | null;
+  tags: string[];
+  condition: ComicCondition | null;
+};
+
+const createForm = (entry?: Entry | null): EntryForm => ({
   id: entry?.id,
   issue_number: entry?.issue_number ?? '0',
   series_id: entry?.series_id ?? props.series_id,
   title: entry?.title ?? '',
   pub_year: entry?.pub_year ?? null,
-  pub_month: entry?.pub_month ?? null,
+  pub_month: entry?.pub_month != null ? String(entry.pub_month) : null,
   cover_path: entry?.cover_path ?? null,
   tags: entry?.tags ?? [],
   condition: entry?.condition ?? null,
 });
 
-const form = ref<Entry>(createForm(props.entry));
+const form = ref<EntryForm>(createForm(props.entry));
 const { showToast } = useToast();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 watch(modelValue, (val) => {
   if (val) form.value = createForm(props.entry);
 });
 
+const parseMonth = (value: string | null): number | null => {
+  if (!value) return null;
+  const month = Number(value);
+  if (!Number.isInteger(month) || month < 1 || month > 12) return null;
+  return month;
+};
+
+const toPayload = (currentForm: EntryForm): Entry => ({
+  ...currentForm,
+  pub_month: parseMonth(currentForm.pub_month),
+});
+
 const create = async () => {
   if (!form.value) return;
   try {
-    await api.createEntry(form.value);
+    await api.createEntry(toPayload(form.value));
     showToast(t('entry_toast_create_success'), 'success');
     emit('created');
     emit('update:modelValue', false);
@@ -135,10 +158,28 @@ const conditionOptions = computed(() => {
   return COMIC_CONDITIONS.map((c) => ({ value: c, label: c }));
 });
 
+const monthOptions = computed(() => {
+  const formatter = new Intl.DateTimeFormat(locale.value === 'it' ? 'it-IT' : 'en-US', {
+    month: 'long',
+  });
+
+  return Array.from({ length: 12 }, (_, index) => {
+    const monthNumber = index + 1;
+    const monthLabel = formatter
+      .format(new Date(2000, index, 1))
+      .replace(/^./, (char) => char.toUpperCase());
+
+    return {
+      value: String(monthNumber),
+      label: monthLabel,
+    };
+  });
+});
+
 const update = async () => {
   if (!form.value.id) return;
   try {
-    await api.updateEntry(form.value.id, form.value);
+    await api.updateEntry(toPayload(form.value));
     showToast(t('entry_toast_update_success'), 'success');
     emit('created');
     emit('update:modelValue', false);

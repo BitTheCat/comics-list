@@ -67,7 +67,7 @@
 </template>
 <script lang="ts" setup>
 import { computed } from "vue";
-import type { PaginationMeta } from "../mocks/api";
+import type { PaginationMeta } from '../types';
 import { useI18n } from '../i18n/useI18n';
 
 interface Field {

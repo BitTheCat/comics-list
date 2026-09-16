@@ -30,8 +30,7 @@ import { useRouter } from 'vue-router';
 import EditButton from '../components/EditButton.vue';
 import ViewButton from '../components/ViewButton.vue';
 import DeleteButton from '../components/DeleteButton.vue';
-import type { Series } from '../types';
-import type { PaginatedResponse, SeriesResource } from '../mocks/api';
+import type { PaginatedResponse, Series, SeriesResource } from '../types';
 import { useToast } from '../composables/useToast';
 import { useI18n } from '../i18n/useI18n';
 
@@ -85,6 +84,7 @@ const loadSeries = async () => {
   try {
     const res = await api.listSeriesPaginated();
     series.value = res as PaginatedResponse<SeriesResource>;
+    console.log('series', series.value)
   } catch (e) {
     console.error(e);
   }
@@ -109,9 +109,9 @@ const openEdit = (series: any) => {
   showModal.value = true;
 };
 
-const deleteSeries = async (id: string | number) => {
+const deleteSeries = async (id: number) => {
   try {
-    await api.deleteSeries({ id });
+    await api.deleteSeries(id as number);
     await refreshSeries();
     showToast(t('series_toast_delete_success'), 'success');
   } catch (e) {

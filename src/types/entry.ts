@@ -18,7 +18,7 @@ export const COMIC_CONDITIONS = [
 export type ComicCondition = (typeof COMIC_CONDITIONS)[number];
 
 export interface Entry {
-  id?: string;
+  id?: number;
   series_id: number;
   issue_number: string;
   title: string;

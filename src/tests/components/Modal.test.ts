@@ -8,6 +8,7 @@ describe('Modal', () => {
       props: {
         modelValue: true,
         title: 'Test modal',
+        submitLabel: 'Save',
       },
     });
 
@@ -25,7 +26,7 @@ describe('Modal', () => {
       },
     });
 
-    expect(queryByRole('button', { name: 'Save' })).toBeNull();
+    expect(queryByRole('button', { name: 'Update' })).toBeNull();
     expect(getByRole('button', { name: 'Cancel' })).toBeTruthy();
   });
 });

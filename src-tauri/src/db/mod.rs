@@ -1,0 +1,27 @@
+mod connection;
+mod migrations;
+mod series;
+mod entry;
+mod publisher;
+
+pub use connection::init_db;
+pub use series::{
+    create_series,
+    update_series,
+    delete_series,
+    list_series_paginated,
+    SeriesRow,
+};
+pub use publisher::{
+    create_publisher,
+    list_publishers,
+    PublisherRow,
+};
+pub use entry::{
+    create_entry,
+    update_entry,
+    delete_entry,
+    list_entries_paginated,    
+    EntryRow,
+};
+

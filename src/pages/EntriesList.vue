@@ -73,8 +73,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { api } from "../api";
-import type { PaginatedResponse } from "../mocks/api";
-import type { Entry } from "../types";
+import type { Entry, PaginatedResponse } from '../types';
 import DeleteButton from "../components/DeleteButton.vue";
 import EditButton from "../components/EditButton.vue";
 import EntryModal from "../components/entries/EntryModal.vue";
@@ -153,7 +152,7 @@ const updateEntries = (response: PaginatedResponse<Entry>) => {
 
 const fetchEntries = async () => {
     if (!props.id) return;
-    const response = await api.listEntriesPaginated(seriesId.value);
+    const response = await api.listEntriesPaginated({ series_id: seriesId.value });
     updateEntries(response as PaginatedResponse<Entry>);
 };
 
@@ -162,7 +161,7 @@ const loadRequestPage = async (isNext: boolean) => {
         const page = isNext
             ? entries.value.pagination.page + 1
             : entries.value.pagination.page - 1;
-        const response = await api.listEntriesPaginated(seriesId.value, { page });
+        const response = await api.listEntriesPaginated({ series_id: seriesId.value, page });
         updateEntries(response as PaginatedResponse<Entry>);
     } catch (error) {
         console.error(error);
@@ -188,7 +187,7 @@ const onCreated = async () => {
     emit("created");
 };
 
-const deleteElement = async (id: string) => {
+const deleteElement = async (id: number) => {
     try {
         await api.deleteEntry(id);
         if (selectedEntry.value?.id === id) selectedEntry.value = null;

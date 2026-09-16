@@ -1,6 +1,6 @@
 <template>
   <div v-if="modelValue" class="modal modal-open" @click="close">
-    <div class="modal-box" @click.stop>
+    <div class="modal-box text-base-content" @click.stop>
       <h3 v-if="title" class="text-lg font-bold">{{ title }}</h3>
 
       <slot />

@@ -16,7 +16,7 @@
         @submit="confirmDelete"
     >
         <div class="flex flex-col items-center gap-3 text-center">
-            <TriangleAlert :size="64" class="text-red-700" />
+            <TriangleAlert :size="64" class="text-error" />
             <p>{{ t('delete_modal_message') }}</p>
         </div>
     </Modal>

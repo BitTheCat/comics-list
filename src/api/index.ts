@@ -1,82 +1,107 @@
+import { invoke } from '@tauri-apps/api/core';
 import * as mock from '../mocks/api';
+import type { ListEntriesRequest, PaginatedResponse, PaginationRequest, SeriesResource } from '../types';
 
-const isTauri = !!(window && (window as any).__TAURI__);
+const isTauriRuntime = () =>
+  typeof window !== 'undefined' &&
+  ('__TAURI_INTERNALS__' in window || '__TAURI__' in window);
 
-async function invokeTauri(cmd: string, payload?: any) {
-  // dynamic import to avoid errors when running in browser without Tauri
-  const tauri = await import('@tauri-apps/api').catch(() => null);
-  if (!tauri || !tauri.core || !tauri.core.invoke) throw new Error('Tauri API not available');
-  return (tauri.core.invoke as any)(cmd, payload);
+async function invokeTauri<T>(cmd: string, payload?: Record<string, unknown>) {
+  return invoke<T>(cmd, payload);
 }
 
 export const api = {
-  listSeries: () => {
-    if (isTauri) return invokeTauri('api_list_series');
-    return mock.getSeries();
-  },
-  listSeriesPaginated: (request: mock.PaginationRequest = {}) => {
-    if (isTauri) return invokeTauri('api_list_series_paginated', { request });
-    return mock.getSeriesPaginated(request);
+  // Series
+  listSeriesPaginated: async (request: PaginationRequest = {}) => {
+    const normalizedRequest: PaginationRequest = {
+      page: Math.max(1, Math.trunc(request.page ?? 1)),
+      page_size: Math.max(1, Math.trunc(request.page_size ?? 10)),
+      query: request.query,
+    };
+
+    if (isTauriRuntime()) {
+      return invokeTauri<PaginatedResponse<SeriesResource>>(
+        'api_list_series_paginated',
+        { request: normalizedRequest },
+      );
+    }
+
+    return mock.getSeriesPaginated(normalizedRequest);
   },
   createSeries: (p: any) => {
-    if (isTauri) return invokeTauri('api_create_series', { payload: p });
+    if (isTauriRuntime()) return invokeTauri('api_create_series', { payload: p });
     return mock.createSeries(p);
   },
   updateSeries: (p: any) => {
-    if (isTauri) return Promise.reject(new Error('Updating series is not supported in Tauri yet'));
+    if (isTauriRuntime()) return invokeTauri('api_update_series', { payload: p });
     return mock.updateSeries(p);
   },
-  deleteSeries: (p: any) => {
-    if (isTauri) return Promise.reject(new Error('Deleting series is not supported in Tauri yet'));
-    return mock.deleteSeries(p);
+  deleteSeries: (id: number) => {
+    if (isTauriRuntime()) return invokeTauri('api_delete_series', { id });
+    return mock.deleteSeries(id);
   },
+
+  // Publishers
   listPublishers: (query = '') => {
-    if (isTauri) return invokeTauri('api_list_publishers', { query });
+    if (isTauriRuntime()) return invokeTauri('api_list_publishers', { name: query });
     return mock.getPublishers(query);
   },
-  getPublisher: (id: string) => {
-    if (isTauri) return invokeTauri('api_get_publisher', { id });
-    return mock.getPublisher(id);
+  getPublisher: async (name: string) => {
+    if (isTauriRuntime()) {
+      const matches = await invokeTauri<Array<{ id: number; name: string }>>('api_list_publishers', { name });
+      return matches[0] ?? null;
+    }
+    return mock.getPublisher(name);
   },
   createPublisher: (payload: { name: string; notes?: string | null }) => {
-    if (isTauri) return invokeTauri('api_create_publisher', { payload });
+    if (isTauriRuntime()) return invokeTauri<number>('api_create_publisher', { payload });
     return mock.createPublisher(payload);
   },
   findOrCreatePublisher: async (name: string) => {
     const normalizedName = name.trim();
     if (!normalizedName) throw new Error('Publisher name is required');
 
-    const publishers = await api.listPublishers(normalizedName) as mock.Publisher[];
+    const publishers = await api.listPublishers(normalizedName) as Array<{ id: number | string; name: string }>;
     const exactMatch = publishers.find(
       (publisher) =>
         publisher.name.toLocaleLowerCase() === normalizedName.toLocaleLowerCase(),
     );
 
-    return exactMatch ?? api.createPublisher({ name: normalizedName });
-  },
-  getEntries: (seriesId: number) => {
-    if (isTauri) return invokeTauri('api_list_entries', { seriesId });
-    return mock.getEntries(seriesId);
-  },
-  listEntriesPaginated: (
-    seriesId: number,
-    request: mock.PaginationRequest = {},
-  ) => {
-    if (isTauri) {
-      return invokeTauri('api_list_entries_paginated', { seriesId, request });
+    if (exactMatch) return exactMatch;
+
+    const createdId = await api.createPublisher({ name: normalizedName });
+
+    if (typeof createdId === 'number') {
+      return { id: createdId, name: normalizedName };
     }
-    return mock.getEntriesPaginated(seriesId, request);
+
+    return createdId as unknown as { id: number | string; name: string };
+  },
+
+  // Entries
+  listEntriesPaginated: async (request: ListEntriesRequest = { series_id: 0 }) => {
+    const normalizedRequest: ListEntriesRequest = {
+      page: Math.max(1, Math.trunc(request.page ?? 1)),
+      page_size: Math.max(1, Math.trunc(request.page_size ?? 10)),
+      query: request.query,
+      series_id: request.series_id,
+    };
+    
+    if (isTauriRuntime()) {
+      return invokeTauri('api_list_entries_paginated', {request: normalizedRequest});
+    }
+    return mock.getEntriesPaginated(request.series_id, request);
   },
   createEntry: (payload: any) => {
-    if (isTauri) return invokeTauri('api_create_entry', { payload });
+    if (isTauriRuntime()) return invokeTauri('api_create_entry', { payload });
     return import('../mocks/api_entries').then((m) => m.createEntry(payload));
   },
-  updateEntry: (id: string, payload: any) => {
-    if (isTauri) return invokeTauri('api_update_entry', { id, payload });
-    return import('../mocks/api_entries').then((m) => m.updateEntry(id, payload));
+  updateEntry: (payload: any) => {
+    if (isTauriRuntime()) return invokeTauri('api_update_entry', { payload });
+    return import('../mocks/api_entries').then((m) => m.updateEntry(payload));
   },
-  deleteEntry: (id: string) => {
-    if (isTauri) return invokeTauri('api_delete_entry', { id });
+  deleteEntry: (id: number) => {
+    if (isTauriRuntime()) return invokeTauri('api_delete_entry', { id });
     return import('../mocks/api_entries').then((m) => m.deleteEntry(id));
   },
 };

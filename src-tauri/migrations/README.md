@@ -13,6 +13,11 @@ Current migrations:
 3. `0003_integer_series_ids.sql`: converts series IDs and related foreign keys
    to integers.
 4. `0004_add_entry_condition.sql`: adds the standard comic condition grade.
+5. `0005_remove_old_column_entry.sql`: removes legacy entry columns no longer used.
+6. `0006_remove_notes_column_publisher.sql`: drops publisher notes.
+7. `0007_integer_publishers_ids.sql`: converts publisher IDs and related foreign
+   keys to integers.
+8. `0008_integer_entries_ids.sql`: converts entry IDs to integers.
 
 To add a migration:
 
