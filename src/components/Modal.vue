@@ -12,7 +12,7 @@
         <button
           v-if="showSubmit"
           class="btn"
-          :class="isDelete ? 'btn-error' : 'btn-warning'"
+          :class="isDelete ? 'btn-error' : 'btn-primary'"
           type="button"
           @click="submit"
         >

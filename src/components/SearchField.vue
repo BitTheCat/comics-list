@@ -7,7 +7,7 @@
             class="input w-full"
             @keyup.enter="emit('search')"
         />
-        <button class="btn btn-warning" type="button" @click="emit('search')">
+        <button class="btn btn-primary" type="button" @click="emit('search')">
             {{ t("search") }}
         </button>
     </div>

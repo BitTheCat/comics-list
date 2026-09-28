@@ -2,7 +2,7 @@
     <aside class="sticky top-4 hidden min-h-64 rounded-box border border-base-content/10 bg-base-100 p-5 md:block">
         <div v-if="entry" class="space-y-5">
             <div>
-                <div class="flex justify-between gap-3 bg-amber-500 p-2 rounded-box border border-base-content/10 text-black">
+                <div class="flex justify-between gap-3 rounded-box border border-base-content/10 bg-primary p-2 text-primary-content">
                     <h2 class="text-xl font-bold">
                         {{ entry.title || `Issue #${entry.issue_number}` }}
                     </h2>

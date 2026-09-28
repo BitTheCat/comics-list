@@ -40,7 +40,7 @@
 
         <div class="form-group">
           <span class="label">{{ t('settings_theme') }}</span>
-          <button class="btn btn-warning" type="button" @click="toggleTheme">
+          <button class="btn btn-primary" type="button" @click="toggleTheme">
             <Sun v-if="theme === 'light'" :size="16" />
             <Moon v-else :size="16" />
             {{ theme === 'light' ? t('settings_theme_light') : t('settings_theme_dark') }}
