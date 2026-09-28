@@ -1,7 +1,7 @@
 export interface PaginationRequest {
   page?: number;
   page_size?: number;
-  query?: string;
+  query?: string | null;
 }
 
 export interface PaginationMeta {

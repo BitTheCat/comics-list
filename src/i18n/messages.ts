@@ -93,6 +93,8 @@ export const messages = {
     image_input_read_error: 'Non è stato possibile leggere l\'immagine.',
     image_input_preview_alt: 'Anteprima immagine',
     image_input_remove: 'Rimuovi immagine',
+    entries_search_placeholder: 'Cerca...',
+    search: 'Cerca',
   },
   en: {
     app_title: 'Comics List',
@@ -188,6 +190,8 @@ export const messages = {
     image_input_read_error: 'The image could not be read.',
     image_input_preview_alt: 'Image preview',
     image_input_remove: 'Remove image',
+    entries_search_placeholder: 'Search...',
+    search: 'Search',
   },
 } as const;
 

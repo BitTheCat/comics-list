@@ -31,8 +31,9 @@ pub fn api_list_series_paginated(
     let page = request.page.unwrap_or(1).max(1);
     let page_size = request.page_size.unwrap_or(10).clamp(1, 100);
     let offset = (page - 1) * page_size;
+    let query = request.query.as_deref();
 
-    list_series_paginated(&conn, page_size, offset).map_err(|e| format!("db query error: {}", e))
+    list_series_paginated(&conn, query, page_size, offset).map_err(|e| format!("db query error: {}", e))
 }
 
 #[tauri::command]

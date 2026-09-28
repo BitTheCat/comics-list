@@ -21,10 +21,26 @@ pub struct SeriesRow {
 
 pub fn list_series_paginated(
     conn: &Connection,
+    query: Option<&str>,
     limit: i64,
     offset: i64,
 ) -> Result<PaginationResponse<SeriesRow>> {
-    let total: i64 = conn.query_row("SELECT COUNT(*) FROM series", [], |row| row.get(0))?;
+    let search_pattern = query
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(|value| format!("%{}%", value));
+
+    let total: i64 = conn.query_row(
+        "
+        SELECT COUNT(*) FROM series
+        WHERE (
+            ?1 IS NULL
+            OR title LIKE ?1
+            OR description LIKE ?1
+        )",
+        [search_pattern.as_deref()],
+        |row| row.get(0),
+    )?;
 
     let mut stmt = conn.prepare(
         "SELECT
@@ -45,10 +61,15 @@ pub fn list_series_paginated(
             ) AS entries_count
         FROM series s
         LEFT JOIN publishers p ON p.id = s.publisher_id
+        WHERE (
+            ?1 IS NULL
+            OR s.title LIKE ?1
+            OR s.description LIKE ?1
+        )
         ORDER BY s.title COLLATE NOCASE
-        LIMIT ?1 OFFSET ?2",
+        LIMIT ?2 OFFSET ?3",
     )?;
-    let rows = stmt.query_map(params![limit, offset], |r| {
+    let rows = stmt.query_map(params![search_pattern.as_deref(), limit, offset], |r| {
         let publisher_id: Option<i64> = r.get(3)?;
         let publisher_name: Option<String> = r.get(4)?;
 
@@ -122,13 +143,7 @@ pub fn update_series(
     Ok(id.unwrap_or(conn.last_insert_rowid()))
 }
 
-pub fn delete_series(
-    conn: &Connection,
-    id: i64,
-) -> Result<bool> {
-    conn.execute(
-        "DELETE FROM series WHERE id = ?1",
-        params![id],
-    )?;
+pub fn delete_series(conn: &Connection, id: i64) -> Result<bool> {
+    conn.execute("DELETE FROM series WHERE id = ?1", params![id])?;
     Ok(true)
 }
