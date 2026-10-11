@@ -1,14 +1,23 @@
 <template>
     <div class="flex gap-2">
-        <RouterLink class="btn btn-sm" to="/series">{{ t('entries_back_to_series') }}</RouterLink>
-        <button class="btn btn-sm" :disabled="!seriesId" @click="openCreate">{{ t('entries_add_number') }}</button>
+        <RouterLink class="btn btn-sm" to="/series">{{
+            t("entries_back_to_series")
+        }}</RouterLink>
+        <button class="btn btn-sm" :disabled="!seriesId" @click="openCreate">
+            {{ t("entries_add_number") }}
+        </button>
     </div>
 
+    <SearchField v-model="searchQuery" @search="fetchEntries(undefined, true)" />
+    
     <div v-if="!props.id">
-        <p>{{ t('entries_select_series_placeholder') }}</p>
+        <p>{{ t("entries_select_series_placeholder") }}</p>
     </div>
 
-    <div v-else class="grid items-start gap-4 md:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)]">
+    <div
+        v-else
+        class="grid items-start gap-4 md:grid-cols-[minmax(0,3fr)_minmax(16rem,2fr)]"
+    >
         <section class="min-w-0">
             <Table
                 :items="entries.items"
@@ -17,8 +26,8 @@
                 selectable
                 :selected-id="selectedEntry?.id"
                 @row-click="selectEntry"
-                @previous="loadRequestPage"
-                @next="loadRequestPage"
+                @previous="fetchEntries"
+                @next="fetchEntries"
             >
                 <template #year="{ item }">
                     {{ formatPublication(item as Entry) }}
@@ -39,7 +48,9 @@
 
         <EntryDetailsPanel
             :entry="selectedEntry"
-            :publication="selectedEntry ? formatPublication(selectedEntry) : '—'"
+            :publication="
+                selectedEntry ? formatPublication(selectedEntry) : '—'
+            "
             @view="openCoverModal"
             @edit="openEdit"
             @delete="deleteEntry"
@@ -55,7 +66,9 @@
     />
     <Modal
         v-model="showCoverModal"
-        :title="t('entries_cover_title', { issue: coverItem?.issue_number ?? '' })"
+        :title="
+            t('entries_cover_title', { issue: coverItem?.issue_number ?? '' })
+        "
         :show-submit="false"
         :cancel-label="t('common_close')"
     >
@@ -73,7 +86,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { api } from "../api";
-import type { Entry, PaginatedResponse } from '../types';
+import type { Entry, PaginatedResponse } from "../types";
 import DeleteButton from "../components/DeleteButton.vue";
 import EditButton from "../components/EditButton.vue";
 import EntryModal from "../components/entries/EntryModal.vue";
@@ -82,13 +95,17 @@ import Modal from "../components/Modal.vue";
 import Table from "../components/Table.vue";
 import ViewButton from "../components/ViewButton.vue";
 import { useToast } from "../composables/useToast";
-import { useI18n } from '../i18n/useI18n';
+import { useI18n } from "../i18n/useI18n";
+import SearchField from "../components/SearchField.vue";
 
-const props = withDefaults(defineProps<{
-    id?: string | null;
-}>(), {
-    id: null,
-});
+const props = withDefaults(
+    defineProps<{
+        id?: string | null;
+    }>(),
+    {
+        id: null,
+    },
+);
 
 const emit = defineEmits<{
     (e: "created"): void;
@@ -102,12 +119,17 @@ const showCoverModal = ref(false);
 const coverItem = ref<Entry | null>(null);
 const { showToast } = useToast();
 const { t, locale } = useI18n();
+const searchQuery = ref<string | null>(null);
 
 const fields = computed(() => [
     { key: "issue_number", label: "#", thClass: "w-1/12" },
-    { key: "title", label: t('entries_field_title') },
-    { key: "year", label: t('entries_field_publication') },
-    { key: "condition", label: t('entries_field_condition'), tdClass: "w-1/12" },
+    { key: "title", label: t("entries_field_title") },
+    { key: "year", label: t("entries_field_publication") },
+    {
+        key: "condition",
+        label: t("entries_field_condition"),
+        tdClass: "w-1/12",
+    },
     {
         key: "actions",
         label: "",
@@ -126,13 +148,18 @@ const entries = ref<PaginatedResponse<Entry>>({
     },
 });
 
-const monthFormatter = computed(() =>
-    new Intl.DateTimeFormat(locale.value === 'it' ? 'it-IT' : 'en-US', { month: "long" }),
+const monthFormatter = computed(
+    () =>
+        new Intl.DateTimeFormat(locale.value === "it" ? "it-IT" : "en-US", {
+            month: "long",
+        }),
 );
 
 const formatMonth = (month: number | null): string | null => {
     if (month == null || month < 1 || month > 12) return null;
-    const formattedMonth = monthFormatter.value.format(new Date(2000, month - 1, 1));
+    const formattedMonth = monthFormatter.value.format(
+        new Date(2000, month - 1, 1),
+    );
     return formattedMonth.charAt(0).toUpperCase() + formattedMonth.slice(1);
 };
 
@@ -145,23 +172,24 @@ const updateEntries = (response: PaginatedResponse<Entry>) => {
     entries.value = response;
     if (!selectedEntry.value?.id) return;
 
-    selectedEntry.value = response.items.find(
-        (entry) => entry.id === selectedEntry.value?.id,
-    ) ?? null;
+    selectedEntry.value =
+        response.items.find((entry) => entry.id === selectedEntry.value?.id) ??
+        null;
 };
 
-const fetchEntries = async () => {
+const fetchEntries = async (isNext?: boolean, resetPage?: boolean) => {
     if (!props.id) return;
-    const response = await api.listEntriesPaginated({ series_id: seriesId.value });
-    updateEntries(response as PaginatedResponse<Entry>);
-};
 
-const loadRequestPage = async (isNext: boolean) => {
+    const page = isNext
+        ? entries.value.pagination.page + 1
+        : entries.value.pagination.page - 1;
+
     try {
-        const page = isNext
-            ? entries.value.pagination.page + 1
-            : entries.value.pagination.page - 1;
-        const response = await api.listEntriesPaginated({ series_id: seriesId.value, page });
+        const response = await api.listEntriesPaginated({
+            series_id: seriesId.value,
+            page: resetPage ? 1 : page,
+            query: searchQuery.value,
+        });
         updateEntries(response as PaginatedResponse<Entry>);
     } catch (error) {
         console.error(error);
@@ -192,10 +220,10 @@ const deleteElement = async (id: number) => {
         await api.deleteEntry(id);
         if (selectedEntry.value?.id === id) selectedEntry.value = null;
         await fetchEntries();
-        showToast(t('entry_toast_delete_success'), "success");
+        showToast(t("entry_toast_delete_success"), "success");
     } catch (error) {
         console.error(error);
-        showToast(t('entry_toast_delete_error'), "error");
+        showToast(t("entry_toast_delete_error"), "error");
     }
 };
 
@@ -208,9 +236,13 @@ const openCoverModal = (item: Entry) => {
     showCoverModal.value = true;
 };
 
-watch(() => props.id, () => {
-    selectedEntry.value = null;
-    coverItem.value = null;
-    void fetchEntries();
-}, { immediate: true });
+watch(
+    () => props.id,
+    () => {
+        selectedEntry.value = null;
+        coverItem.value = null;
+        void fetchEntries();
+    },
+    { immediate: true },
+);
 </script>

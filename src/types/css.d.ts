@@ -3,3 +3,8 @@ declare module '*.scss';
 declare module '*.sass';
 declare module '*.less';
 declare module '*.styl';
+declare module '*.png';
+declare module '*.svg';
+declare module '*.jpg';
+declare module '*.jpeg';
+declare module '*.webp';

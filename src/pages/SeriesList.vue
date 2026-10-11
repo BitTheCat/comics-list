@@ -3,12 +3,17 @@
       <div class="flex gap-4">
           <button class="btn  btn-sm" @click="showModal = true">{{ t('series_add') }}</button>
       </div>
+
+    <SearchField v-model="searchQuery" @search="fetchSeries(undefined, true)" />
+      
       <Table 
         :items="series.items" 
         :fields="fields" 
         :pagination="series.pagination"
-        @previous="loadRequestPage"
-        @next="loadRequestPage">
+        selectable
+        @row-click="v => viewDetails(v.id)"
+        @previous="fetchSeries"
+        @next="fetchSeries">
           <template #actions="{ item }">
           <div class="flex gap-2">
                 <EditButton @click="openEdit(item)"/>
@@ -33,6 +38,7 @@ import DeleteButton from '../components/DeleteButton.vue';
 import type { PaginatedResponse, Series, SeriesResource } from '../types';
 import { useToast } from '../composables/useToast';
 import { useI18n } from '../i18n/useI18n';
+import SearchField from '../components/SearchField.vue';
 
 
 const router = useRouter();
@@ -41,6 +47,7 @@ const showModal = ref(false);
 const editItem = ref<Series | null>(null);
 const { showToast } = useToast();
 const { t } = useI18n();
+const searchQuery = ref<string | null>(null);
 
 const fields = computed(() => ([
   {
@@ -80,20 +87,16 @@ const series = ref<PaginatedResponse<SeriesResource>>({
   },
 });
 
-const loadSeries = async () => {
-  try {
-    const res = await api.listSeriesPaginated();
-    series.value = res as PaginatedResponse<SeriesResource>;
-    console.log('series', series.value)
-  } catch (e) {
-    console.error(e);
-  }
-};
+const fetchSeries = async (isNext?: boolean, resetPage?: boolean) => {
+  const page = isNext
+    ? series.value.pagination.page + 1
+    : series.value.pagination.page - 1;
 
-const loadRequestPage = async (isNext: boolean) => {
   try {
-    const pageValue = isNext ? series.value.pagination.page + 1 : series.value.pagination.page - 1;
-    const res = await api.listSeriesPaginated({ page: pageValue });
+    const res = await api.listSeriesPaginated({
+      page: resetPage ? 1 : page,
+      query: searchQuery.value,
+    });
     series.value = res as PaginatedResponse<SeriesResource>;
   } catch (e) {
     console.error(e);
@@ -101,7 +104,7 @@ const loadRequestPage = async (isNext: boolean) => {
 };
 
 onMounted(() => {
-  loadSeries();
+  fetchSeries();
 });
 
 const openEdit = (series: any) => {
@@ -120,7 +123,7 @@ const deleteSeries = async (id: number) => {
   }
 };
 
-const refreshSeries = loadSeries;
+const refreshSeries = fetchSeries;
 
 const onCreated = async () => {
   // refresh local list

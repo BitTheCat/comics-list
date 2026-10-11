@@ -44,9 +44,23 @@ pub fn list_entries_paginated(
     limit: i64,
     offset: i64,
 ) -> Result<PaginationResponse<EntryRow>> {
+    let search_pattern = query
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(|value| format!("%{}%", value));
+
     let total: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM entries WHERE series_id = ?1",
-        [series_id],
+        "SELECT COUNT(*)
+         FROM entries e
+         WHERE e.series_id = ?1
+           AND (
+               ?2 IS NULL
+               OR e.title LIKE ?2
+               OR e.issue_number LIKE ?2
+               OR e.tags LIKE ?2
+               OR e.condition LIKE ?2
+           )",
+        params![series_id, search_pattern.as_deref()],
         |row| row.get(0),
     )?;
 
@@ -65,26 +79,36 @@ pub fn list_entries_paginated(
             e.updated_at
         FROM entries e
         WHERE e.series_id = ?1
+          AND (
+              ?2 IS NULL
+              OR e.title LIKE ?2
+              OR e.issue_number LIKE ?2
+              OR e.tags LIKE ?2
+              OR e.condition LIKE ?2
+          )
         ORDER BY e.issue_number COLLATE NOCASE
-        LIMIT ?2 OFFSET ?3",
+        LIMIT ?3 OFFSET ?4",
     )?;
-    let rows = stmt.query_map(params![series_id, limit, offset], |r| {
-        let tags_raw: Option<String> = r.get(7).ok().flatten();
+    let rows = stmt.query_map(
+        params![series_id, search_pattern.as_deref(), limit, offset],
+        |r| {
+            let tags_raw: Option<String> = r.get(7).ok().flatten();
 
-        Ok(EntryRow {
-            id: r.get(0)?,
-            series_id: r.get(1)?,
-            issue_number: r.get(2)?,
-            title: r.get(3).ok(),
-            pub_year: r.get(4).ok(),
-            pub_month: r.get(5).ok(),
-            cover_path: r.get(6).ok(),
-            tags: parse_tags(tags_raw.as_deref()),
-            condition: r.get(8).ok(),
-            created_at: r.get(9)?,
-            updated_at: r.get(10)?,
-        })
-    })?;
+            Ok(EntryRow {
+                id: r.get(0)?,
+                series_id: r.get(1)?,
+                issue_number: r.get(2)?,
+                title: r.get(3).ok(),
+                pub_year: r.get(4).ok(),
+                pub_month: r.get(5).ok(),
+                cover_path: r.get(6).ok(),
+                tags: parse_tags(tags_raw.as_deref()),
+                condition: r.get(8).ok(),
+                created_at: r.get(9)?,
+                updated_at: r.get(10)?,
+            })
+        },
+    )?;
 
     let mut res = Vec::new();
     for s in rows {

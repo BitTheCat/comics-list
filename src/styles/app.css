@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* Custom warning palette: warm orange with readable contrast in both themes. */
+:root,
+[data-theme="light"] {
+    --color-primary: #d97706;
+    --color-primary-content: #ffffff;
+    --color-warning: #eab308;
+    --color-warning-content: #422006;
+}
+
+[data-theme="dark"] {
+    --color-primary: #d97706;
+    --color-primary-content: #291500;
+    --color-warning: #facc15;
+    --color-warning-content: #422006;
+}
+
 @layer base {
     form {
         @apply space-y-4;

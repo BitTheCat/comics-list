@@ -31,6 +31,10 @@ fn init_db_once() -> Mutex<Connection> {
         "../../migrations/0007_integer_publishers_ids.sql"
     ))
     .expect("failed to apply migration 0007");
+    conn.execute_batch(include_str!(
+        "../../migrations/0008_integer_entries_ids.sql"
+    ))
+    .expect("failed to apply migration 0008");
 
     Mutex::new(conn)
 }
