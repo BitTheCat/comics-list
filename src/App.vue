@@ -1,9 +1,16 @@
 <template>
   <div id="app" class="p-4">
     <header class="mb-4 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold">{{ t('app_title') }}</h1>
-        <span class="mt-0 text-xs text-muted">{{ t('app_subtitle') }}</span>
+      <div class="flex items-center gap-3">
+        <img
+          :src="logoUrl"
+          alt=""
+          class="h-10 w-10 rounded-lg"
+        />
+        <div>
+          <h1 class="text-2xl font-bold">{{ t('app_title') }}</h1>
+          <span class="mt-0 text-xs text-muted">{{ t('app_subtitle') }}</span>
+        </div>
       </div>
 
       <button class="btn btn-sm" type="button" @click="showSettings = true">
@@ -56,6 +63,7 @@
 <script lang="ts" setup>
 import { Moon, Settings2, Sun } from '@lucide/vue';
 import { ref } from 'vue';
+import logoUrl from './assets/logo.png';
 import Modal from './components/Modal.vue';
 import ToastContainer from './components/ToastContainer.vue';
 import { useTheme } from './composables/useTheme';
