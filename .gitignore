@@ -9,4 +9,4 @@ src-tauri/Cargo.lock
 .vscode
 *.log
 src-tauri/gen/
-AGENTS.md
+AGENTS.local.md
