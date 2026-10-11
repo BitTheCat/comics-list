@@ -51,7 +51,8 @@ export const api = {
       const matches = await invokeTauri<Array<{ id: number; name: string }>>('api_list_publishers', { name });
       return matches[0] ?? null;
     }
-    return mock.getPublisher(name);
+    const matches = await mock.getPublishers(name);
+    return matches[0] ?? null;
   },
   createPublisher: (payload: { name: string; notes?: string | null }) => {
     if (isTauriRuntime()) return invokeTauri<number>('api_create_publisher', { payload });
@@ -61,7 +62,7 @@ export const api = {
     const normalizedName = name.trim();
     if (!normalizedName) throw new Error('Publisher name is required');
 
-    const publishers = await api.listPublishers(normalizedName) as Array<{ id: number | string; name: string }>;
+    const publishers = await api.listPublishers(normalizedName) as Array<{ id: number; name: string }>;
     const exactMatch = publishers.find(
       (publisher) =>
         publisher.name.toLocaleLowerCase() === normalizedName.toLocaleLowerCase(),
@@ -75,7 +76,7 @@ export const api = {
       return { id: createdId, name: normalizedName };
     }
 
-    return createdId as unknown as { id: number | string; name: string };
+    return createdId as unknown as { id: number; name: string };
   },
 
   // Entries

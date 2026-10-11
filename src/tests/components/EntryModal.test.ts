@@ -47,7 +47,7 @@ describe('EntryModal', () => {
 
   it('renders existing cover preview in edit mode', async () => {
     const entry: Entry = {
-      id: '1',
+      id: 1,
       issue_number: '1',
       title: 'Test',
       series_id: 1,
@@ -71,7 +71,7 @@ describe('EntryModal', () => {
 
   it('opens in edit mode', () => {
     const entry: Entry = {
-      id: '1',
+      id: 1,
       issue_number: '1',
       title: 'Test',
       series_id: 1,
