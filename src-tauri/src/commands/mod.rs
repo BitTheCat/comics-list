@@ -1,8 +1,9 @@
+mod entry;
 mod publisher;
 mod series;
-mod entry;
 
-pub fn handler<R: tauri::Runtime>() -> impl Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync + 'static {
+pub fn handler<R: tauri::Runtime>() -> impl Fn(tauri::ipc::Invoke<R>) -> bool + Send + Sync + 'static
+{
     tauri::generate_handler![
         // Series
         series::api_list_series_paginated,

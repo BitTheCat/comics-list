@@ -7,8 +7,8 @@ use crate::models::entry::{EntryPayload, ListEntriesRequest};
 use crate::models::pagination::PaginationResponse;
 
 #[tauri::command]
-pub fn api_create_entry(payload: EntryPayload) -> Result<i64, String> {
-    let conn = init_db().map_err(|e| format!("db init error: {}", e))?;
+pub fn api_create_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<i64, String> {
+    let conn = init_db(&app)?;
     let now = Utc::now().to_rfc3339();
     let tags = payload.tags.as_ref().map(|v| v.join(","));
 
@@ -30,9 +30,10 @@ pub fn api_create_entry(payload: EntryPayload) -> Result<i64, String> {
 
 #[tauri::command]
 pub fn api_list_entries_paginated(
+    app: tauri::AppHandle,
     request: ListEntriesRequest,
 ) -> Result<PaginationResponse<EntryRow>, String> {
-    let conn = init_db().map_err(|e| format!("db init error: {}", e))?;
+    let conn = init_db(&app)?;
 
     let series_id = request.series_id;
     let query = request.pagination.query.as_deref();
@@ -45,8 +46,8 @@ pub fn api_list_entries_paginated(
 }
 
 #[tauri::command]
-pub fn api_update_entry(payload: EntryPayload) -> Result<i64, String> {
-    let conn = init_db().map_err(|e| format!("db init error: {}", e))?;
+pub fn api_update_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<i64, String> {
+    let conn = init_db(&app)?;
     let now = Utc::now().to_rfc3339();
     let tags = payload.tags.as_ref().map(|v| v.join(","));
 
@@ -68,8 +69,8 @@ pub fn api_update_entry(payload: EntryPayload) -> Result<i64, String> {
 }
 
 #[tauri::command]
-pub fn api_delete_entry(id: i64) -> Result<(), String> {
-    let conn = init_db().map_err(|e| format!("db init error: {}", e))?;
+pub fn api_delete_entry(app: tauri::AppHandle, id: i64) -> Result<(), String> {
+    let conn = init_db(&app)?;
     delete_entry(&conn, id).map_err(|e| format!("db delete error: {}", e))?;
     Ok(())
 }
