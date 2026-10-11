@@ -4,8 +4,6 @@ mod commands;
 mod db;
 mod models;
 
-use tauri::Manager;
-
 fn main() {
     tauri::Builder::default()
         .invoke_handler(commands::handler())
