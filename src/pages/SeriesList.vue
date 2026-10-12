@@ -11,13 +11,13 @@
         :fields="fields" 
         :pagination="series.pagination"
         selectable
-        @row-click="v => viewDetails(v.id)"
+        @row-click="v => viewDetails(v as SeriesResource)"
         @previous="fetchSeries"
         @next="fetchSeries">
           <template #actions="{ item }">
           <div class="flex gap-2">
                 <EditButton @click="openEdit(item)"/>
-                <ViewButton @click="viewDetails(item.id)" />
+                <ViewButton @click="viewDetails(item as SeriesResource)" />
                 <DeleteButton :disabled="item.entries_count > 0" @delete="deleteSeries(item.id)" />
           </div>
           </template>
@@ -130,8 +130,12 @@ const onCreated = async () => {
   await refreshSeries();
 };
 
-const viewDetails = (id: string | number) => {
-  router.push({ name: 'series-detail', params: { id } });
+const viewDetails = (series: SeriesResource) => {
+  router.push({
+    name: 'series-detail',
+    params: { id: series.id },
+    query: { min_year: series.start_year ?? undefined },
+  });
 };
 
 </script>

@@ -24,6 +24,7 @@
         <YearSelect
           id="entry-publication-year"
           v-model="form.pub_year"
+          :min-year="minYear"
           :label="t('entry_modal_publication_year')"
           name="pub_year"
         />
@@ -83,11 +84,13 @@ import Input from '../Input.vue';
 
 const props = withDefaults(defineProps<{
   modelValue?: boolean;
-  series_id: number;
+  seriesId: number;
   entry?: Entry | null;
+  minYear?: number;
 }>(), {
   modelValue: false,
   entry: null,
+  minYear: 1950,
 });
 
 const modelValue = toRef(props, 'modelValue');
@@ -112,7 +115,7 @@ type EntryForm = {
 const createForm = (entry?: Entry | null): EntryForm => ({
   id: entry?.id,
   issue_number: entry?.issue_number ?? '0',
-  series_id: entry?.series_id ?? props.series_id,
+  series_id: entry?.series_id ?? props.seriesId,
   title: entry?.title ?? '',
   pub_year: entry?.pub_year ?? null,
   pub_month: entry?.pub_month != null ? String(entry.pub_month) : null,

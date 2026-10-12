@@ -61,7 +61,8 @@
         v-if="seriesId"
         v-model="showModal"
         :entry="editItem"
-        :series_id="seriesId"
+        :series-id="seriesId"
+        :min-year="minYear"
         @created="onCreated"
     />
     <Modal
@@ -100,10 +101,12 @@ import SearchField from "../components/SearchField.vue";
 
 const props = withDefaults(
     defineProps<{
-        id?: string | null;
+      id?: string | null;
+      minYear?: number;
     }>(),
     {
         id: null,
+        minYear: 1950,
     },
 );
 
