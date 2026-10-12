@@ -80,7 +80,7 @@ fn update_entry_updates_existing_row() {
 
         let updated_id = update_entry(
             conn,
-            Some(entry_id),
+            entry_id,
             series_id,
             "1A",
             Some("The Return"),

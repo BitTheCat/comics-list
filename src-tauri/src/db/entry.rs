@@ -127,7 +127,7 @@ pub fn list_entries_paginated(
 
 pub fn update_entry(
     conn: &Connection,
-    id: Option<i64>,
+    id: i64,
     series_id: i64,
     issue_number: &str,
     title: Option<&str>,
@@ -142,7 +142,7 @@ pub fn update_entry(
         "UPDATE entries SET series_id = ?1, issue_number = ?2, title = ?3, pub_year = ?4, pub_month = ?5, cover_path = ?6, tags = ?7, condition = ?8, updated_at = ?9 WHERE id = ?10",
         params![series_id, issue_number, title, pub_year, pub_month, cover_path, tags, condition, now, id],
     )?;
-    Ok(id.unwrap_or(conn.last_insert_rowid()))
+    Ok(id)
 }
 
 pub fn delete_entry(conn: &Connection, id: i64) -> Result<()> {

@@ -108,7 +108,7 @@ fn update_series_updates_existing_row() {
 
         let updated_id = db_update_series(
             conn,
-            Some(first_series_id),
+            first_series_id,
             "Spawn Deluxe",
             Some("Edizione aggiornata"),
             Some(publisher_id),

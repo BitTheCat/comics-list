@@ -4,10 +4,13 @@ use crate::db::{
     create_series, delete_series, init_db, list_series_paginated, update_series, SeriesRow,
 };
 use crate::models::pagination::{PaginationRequest, PaginationResponse};
-use crate::models::series::SeriesPayload;
+use crate::models::series::{CreateSeriesPayload, UpdateSeriesPayload};
 
 #[tauri::command]
-pub fn api_create_series(app: tauri::AppHandle, payload: SeriesPayload) -> Result<i64, String> {
+pub fn api_create_series(
+    app: tauri::AppHandle,
+    payload: CreateSeriesPayload,
+) -> Result<i64, String> {
     let conn = init_db(&app)?;
     let now = Utc::now().to_rfc3339();
     let id = create_series(
@@ -41,7 +44,10 @@ pub fn api_list_series_paginated(
 }
 
 #[tauri::command]
-pub fn api_update_series(app: tauri::AppHandle, payload: SeriesPayload) -> Result<i64, String> {
+pub fn api_update_series(
+    app: tauri::AppHandle,
+    payload: UpdateSeriesPayload,
+) -> Result<i64, String> {
     let conn = init_db(&app)?;
     let now = Utc::now().to_rfc3339();
     let id = update_series(

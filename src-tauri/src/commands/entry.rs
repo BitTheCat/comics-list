@@ -3,11 +3,11 @@ use chrono::Utc;
 use crate::db::{
     create_entry, delete_entry, init_db, list_entries_paginated, update_entry, EntryRow,
 };
-use crate::models::entry::{EntryPayload, ListEntriesRequest};
+use crate::models::entry::{CreateEntryPayload, ListEntriesRequest, UpdateEntryPayload};
 use crate::models::pagination::PaginationResponse;
 
 #[tauri::command]
-pub fn api_create_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<i64, String> {
+pub fn api_create_entry(app: tauri::AppHandle, payload: CreateEntryPayload) -> Result<i64, String> {
     let conn = init_db(&app)?;
     let now = Utc::now().to_rfc3339();
     let tags = payload.tags.as_ref().map(|v| v.join(","));
@@ -46,7 +46,7 @@ pub fn api_list_entries_paginated(
 }
 
 #[tauri::command]
-pub fn api_update_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<i64, String> {
+pub fn api_update_entry(app: tauri::AppHandle, payload: UpdateEntryPayload) -> Result<i64, String> {
     let conn = init_db(&app)?;
     let now = Utc::now().to_rfc3339();
     let tags = payload.tags.as_ref().map(|v| v.join(","));
