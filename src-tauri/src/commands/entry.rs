@@ -1,14 +1,19 @@
+use std::sync::Mutex;
+use rusqlite::Connection;
 use chrono::Utc;
 
 use crate::db::{
-    create_entry, delete_entry, init_db, list_entries_paginated, update_entry, EntryRow,
+    create_entry, delete_entry, list_entries_paginated, update_entry, EntryRow,
 };
-use crate::models::entry::{EntryPayload, ListEntriesRequest};
+use crate::models::entry::{CreateEntryPayload, ListEntriesRequest, UpdateEntryPayload};
 use crate::models::pagination::PaginationResponse;
 
 #[tauri::command]
-pub fn api_create_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<i64, String> {
-    let conn = init_db(&app)?;
+pub fn api_create_entry(
+    state: tauri::State<'_, Mutex<Connection>>, 
+    payload: CreateEntryPayload
+) -> Result<i64, String> {
+    let conn = state.lock().map_err(|e| e.to_string())?;
     let now = Utc::now().to_rfc3339();
     let tags = payload.tags.as_ref().map(|v| v.join(","));
 
@@ -30,10 +35,10 @@ pub fn api_create_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<
 
 #[tauri::command]
 pub fn api_list_entries_paginated(
-    app: tauri::AppHandle,
+    state: tauri::State<'_, Mutex<Connection>>, 
     request: ListEntriesRequest,
 ) -> Result<PaginationResponse<EntryRow>, String> {
-    let conn = init_db(&app)?;
+    let conn = state.lock().map_err(|e| e.to_string())?;
 
     let series_id = request.series_id;
     let query = request.pagination.query.as_deref();
@@ -46,8 +51,11 @@ pub fn api_list_entries_paginated(
 }
 
 #[tauri::command]
-pub fn api_update_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<i64, String> {
-    let conn = init_db(&app)?;
+pub fn api_update_entry(
+    state: tauri::State<'_, Mutex<Connection>>, 
+    payload: UpdateEntryPayload
+) -> Result<i64, String> {
+    let conn = state.lock().map_err(|e| e.to_string())?;
     let now = Utc::now().to_rfc3339();
     let tags = payload.tags.as_ref().map(|v| v.join(","));
 
@@ -69,8 +77,11 @@ pub fn api_update_entry(app: tauri::AppHandle, payload: EntryPayload) -> Result<
 }
 
 #[tauri::command]
-pub fn api_delete_entry(app: tauri::AppHandle, id: i64) -> Result<(), String> {
-    let conn = init_db(&app)?;
+pub fn api_delete_entry(
+    state: tauri::State<'_, Mutex<Connection>>, 
+    id: i64
+) -> Result<(), String> {
+    let conn = state.lock().map_err(|e| e.to_string())?;
     delete_entry(&conn, id).map_err(|e| format!("db delete error: {}", e))?;
     Ok(())
 }

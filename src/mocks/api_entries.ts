@@ -3,7 +3,7 @@ import { mockEntries } from './api';
 
 export async function createEntry(payload: any) {
   // payload should contain at least series_id and issue_number
-  const id = 'e' + Math.random().toString(36).slice(2, 9);
+  const id = Math.max(0, ...mockEntries.map((entry) => entry.id)) + 1;
   const entry = { id, ...payload };
   mockEntries.push(entry);
   return new Promise((resolve) => setTimeout(() => resolve(entry), 50));

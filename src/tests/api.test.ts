@@ -88,7 +88,7 @@ describe('mock api', () => {
     const initialCount = mockPublishers.length;
     const publisher = await createPublisher({ name: 'PANINI COMICS' });
 
-    expect(publisher.id).toBe('p2');
+    expect(publisher.id).toBe(2);
     expect(mockPublishers).toHaveLength(initialCount);
   });
 });

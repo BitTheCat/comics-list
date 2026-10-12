@@ -4,14 +4,16 @@ mod commands;
 mod db;
 mod models;
 
+use std::sync::Mutex;
+use tauri::Manager;
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(commands::handler())
         .setup(|app| {
-            // initialize DB on startup (ignore errors here — commands will report them)
-            if let Err(e) = db::init_db(app.handle()) {
-                println!("failed to init db: {}", e);
-            }
+            let conn = db::init_db(app.handle())
+                .expect("failed to initialize db");
+            app.manage(Mutex::new(conn));
             Ok(())
         })
         .run(tauri::generate_context!())

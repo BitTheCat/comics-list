@@ -30,9 +30,8 @@ describe('SeriesModal', () => {
       id: 1,
       title: 'Test',
       description: 'Test Description',
-      publisher_id: '1',
       publisher: {
-        id: '1',
+        id: 1,
         name: 'Test Publisher',
       },
       start_year: 2020,

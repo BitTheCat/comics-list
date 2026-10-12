@@ -1,5 +1,5 @@
 export interface Publisher {
-  id: number | string;
+  id: number;
   name: string;
   notes?: string | null;
 }

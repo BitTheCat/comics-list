@@ -10,9 +10,9 @@ import type {
 type StoredSeries = Omit<SeriesResource, 'entries_count'>;
 
 export const mockPublishers: Publisher[] = [
-  { id: 'p1', name: 'Star Comics', notes: null },
-  { id: 'p2', name: 'Panini Comics', notes: null },
-  { id: 'p3', name: 'Cult Comics', notes: null },
+  { id: 1, name: 'Star Comics', notes: null },
+  { id: 2, name: 'Panini Comics', notes: null },
+  { id: 3, name: 'Cult Comics', notes: null },
 ];
 
 const additionalSeries: StoredSeries[] = [
@@ -77,7 +77,7 @@ export const mockSeries: StoredSeries[] = [
 
 export const mockEntries = [
   ...Array.from({ length: 32 }, (_, index) => ({
-    id: `e1-${index + 1}`,
+    id: index + 1,
     series_id: 1,
     issue_number: String(index + 1),
     title: `Spawn #${index + 1}`,
@@ -88,7 +88,7 @@ export const mockEntries = [
     condition: COMIC_CONDITIONS[index % COMIC_CONDITIONS.length],
   })),
   ...Array.from({ length: 11 }, (_, index) => ({
-    id: `e2-${index + 1}`,
+    id: 33 + index,
     series_id: 2,
     issue_number: String(index + 1),
     title: `Spawn (reboot) #${index + 1}`,
@@ -200,7 +200,7 @@ export async function getPublishers(query = '') {
   );
 }
 
-export async function getPublisher(id: string) {
+export async function getPublisher(id: number) {
   const publisher = mockPublishers.find((item) => item.id === id) ?? null;
   return new Promise<Publisher | null>((resolve) =>
     setTimeout(() => resolve(publisher), 50),
@@ -217,7 +217,7 @@ export async function createPublisher(payload: { name: string; notes?: string | 
   if (existing) return existing;
 
   const publisher: Publisher = {
-    id: 'p' + Math.random().toString(36).slice(2, 9),
+    id: Math.max(0, ...mockPublishers.map((item) => item.id)) + 1,
     name,
     notes: payload.notes?.trim() || null,
   };

@@ -86,36 +86,21 @@ cargo test --manifest-path src-tauri/Cargo.toml   # Rust tests
 
 ## Roadmap
 
-### Done
+Status: ✅ = Done · ⏩ = Next · ⌛ = Later.
+Rows are ordered by priority within each status.
 
-- UI: series/entries listing with pagination and search, create/edit/delete
-  modals, condition field, entry details panel, delete confirmation, toasts,
-  localized settings, theme toggle, logo and platform icons.
-- Rust: module split (commands/db/models), versioned migration runner,
-  base CRUD for series/publisher/entry, paginated listing, search filters,
-  DB path fix (app data dir).
-
-### Next
-
-1. Align mock entry IDs to numeric (currently strings like `e1-1` in
-   `src/mocks/api.ts` / `src/mocks/api_entries.ts`).
-2. Make `id` required in update payloads (remove `Option<i64>`).
-3. Refactor DB connection to Tauri managed state (open once at startup).
-
-### Later (ordered)
-
-1. **Multi-language** phase: complete i18n coverage (Italian/English), persist
-   language choice in settings.
-2. **Covers**: store cover images on disk in the app data dir, generate
-   thumbnails (Rust side), show in lists/details; optional hash-based dedup.
-3. Import/export of the collection (JSON/CSV) including cover files.
-4. Settings persistence (theme, language, DB path info).
-5. **Auto-update**: check for a new version at startup and let the app download
-   and install it. Use the Tauri updater plugin (`tauri-plugin-updater`) with
-   `tauri-plugin-process` for relaunch; requires a signed update manifest
-   (minisign keypair) and a release endpoint (e.g. GitHub Releases) that serves
-   the `latest.json` manifest. Surface the check in Settings (current version,
-   "check for updates" button, download/install progress) and keep the version
-   in `tauri.conf.json` / `Cargo.toml` / `package.json` in sync.
-6. Stretch features: CBZ/CBR reader with reading progress, metadata fetch
-   (e.g. ComicVine) for cover suggestions on demand, sync.
+| # | Item | Status | Area | Details |
+|---|------|--------|------|---------|
+| 1 | Series/entries UI | ✅ | UI | Listing with pagination and search; create/edit/delete modals; condition field; entry details panel; delete confirmation; toasts; localized settings; theme toggle; logo and platform icons. |
+| 2 | Rust backend core | ✅ | Rust | Module split (commands/db/models); versioned migration runner; base CRUD for series/publisher/entry; paginated listing; search filters; DB path fix (app data dir). |
+| 3 | Numeric mock IDs | ✅ | Mocks | Numeric IDs for publishers and entries, aligned with Rust. |
+| 4 | Split create/update payloads | ✅ | API | `id` is required on update (removed `Option<i64>`). |
+| 5 | DB managed state | ✅ | Rust | Open the DB connection once at startup; `app.manage(Mutex<Connection>)`; commands take `State<'_, Mutex<Connection>>` instead of `init_db(&app)`. |
+| 6 | Entry year range | ⏩ | UI | Limit the publication-year select to the series' year range (a series started in 2000 can't have entries with an earlier year). |
+| 7 | Next issue number | ⏩ | UI | When adding an entry, prefill the next number (1 if it's the first, otherwise last + 1; if there are gaps, use the last). |
+| 8 | Empty title placeholder | ⏩ | UI | Show `-` in the list when an entry title is empty. |
+| 9 | Multi-language | ⌛ | i18n | Complete i18n coverage (Italian/English); persist language choice in settings. |
+| 10 | Covers | ⌛ | Rust/UI | Store cover images on disk in the app data dir; generate thumbnails (Rust side); show in lists/details; optional hash-based dedup. |
+| 11 | Import/export | ⌛ | API/UI | Import/export of the collection (JSON/CSV) including cover files. |
+| 12 | Settings persistence | ⌛ | UI | Persist theme, language, DB path info. |
+| 13 | Auto-update | ⌛ | Rust/UI | Check for a new version at startup and download/install it. Use `tauri-plugin-updater` + `tauri-plugin-process`; requires a signed manifest (minisign keypair) and a release endpoint (e.g. GitHub Releases serving `latest.json`); surface in Settings; keep the version in sync across `tauri.conf.json` / `Cargo.toml` / `package.json`. |
