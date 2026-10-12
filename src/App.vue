@@ -7,9 +7,9 @@
           alt=""
           class="h-10 w-10 rounded-lg"
         />
-        <div>
-          <h1 class="text-2xl font-bold">{{ t('app_title') }}</h1>
-          <span class="mt-0 text-xs text-muted">{{ t('app_subtitle') }}</span>
+        <div class="flex flex-col">
+          <h1 class="text-2xl font-bold leading-none">{{ t('app_title') }}</h1>
+          <span class="text-xs text-muted leading-none">{{ t('app_subtitle') }}</span>
         </div>
       </div>
 
