@@ -1,14 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { COMIC_CONDITIONS } from '../types';
+import { getSeries, getSeriesPaginated } from '../mocks/series';
+import { getEntriesPaginated } from '../mocks/entry';
 import {
   createPublisher,
-  getEntriesPaginated,
   getPublisher,
   getPublishers,
-  getSeries,
-  getSeriesPaginated,
   mockPublishers,
-} from '../mocks/api';
+} from '../mocks/publisher';
 
 describe('mock api', () => {
   it('getSeries returns an array', async () => {
