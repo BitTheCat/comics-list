@@ -150,6 +150,16 @@ pub fn delete_entry(conn: &Connection, id: i64) -> Result<()> {
     Ok(())
 }
 
+pub fn next_issue_number(conn: &Connection, series_id: i64) -> Result<String> {
+    let max: Option<i64> = conn.query_row(
+        "SELECT MAX(CAST(issue_number AS INTEGER)) FROM entries WHERE series_id = ?1", 
+        params![series_id],
+        |row| row.get(0),
+    ).ok();
+    let next = max.unwrap_or(0) + 1;
+    Ok(next.to_string())
+}
+
 fn parse_tags(tags: Option<&str>) -> Vec<String> {
     tags.unwrap_or_default()
         .split(',')

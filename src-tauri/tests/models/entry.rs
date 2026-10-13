@@ -1,5 +1,5 @@
 use comics_list_tauri::db::{
-    create_entry, create_series, delete_entry, list_entries_paginated, update_entry,
+    create_entry, create_series, delete_entry, list_entries_paginated, update_entry, next_issue_number
 };
 
 use crate::common::with_test_db;
@@ -207,4 +207,26 @@ fn list_entries_filters_by_title_tags_and_condition() {
             .expect("list with empty query");
         assert_eq!(empty_query.pagination.total_items, 2);
     });
+}
+
+#[test]
+fn test_api_retrieve_next_issue_number() {
+    with_test_db(|conn| {
+        let series_id = create_series(conn, "Test Series", None, None, None, None, None, "2024-01-01T00:00:00Z").expect("create series");
+        let next_issue = next_issue_number(conn, series_id).expect("retrieve next issue");
+        assert_eq!(next_issue, "1");
+
+        create_entry(conn, series_id, "4", None, None, None, None, None, None, "2024-01-01T00:00:00Z")
+            .expect("create entry");
+
+        let next_issue = next_issue_number(conn, series_id).expect("retrieve next issue");
+        assert_eq!(next_issue, "5");
+
+        create_entry(conn, series_id, "10a", None, None, None, None, None, None, "2024-01-01T00:00:00Z")
+            .expect("create entry");
+        let next_issue = next_issue_number(conn, series_id).expect("retrieve next issue");
+        assert_eq!(next_issue, "11");
+        
+    });
+    
 }

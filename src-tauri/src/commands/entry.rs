@@ -1,9 +1,9 @@
-use std::sync::Mutex;
-use rusqlite::Connection;
 use chrono::Utc;
+use rusqlite::Connection;
+use std::sync::Mutex;
 
 use crate::db::{
-    create_entry, delete_entry, list_entries_paginated, update_entry, EntryRow,
+    create_entry, delete_entry, list_entries_paginated, next_issue_number, update_entry, EntryRow,
 };
 use crate::models::entry::{CreateEntryPayload, ListEntriesRequest, UpdateEntryPayload};
 use crate::models::pagination::PaginationResponse;
@@ -84,4 +84,13 @@ pub fn api_delete_entry(
     let conn = state.lock().map_err(|e| e.to_string())?;
     delete_entry(&conn, id).map_err(|e| format!("db delete error: {}", e))?;
     Ok(())
+}
+
+#[tauri::command]
+pub fn api_retrieve_next_issue_number(
+    state: tauri::State<'_, Mutex<Connection>>,
+    series_id: i64,
+) -> Result<String, String> {
+    let conn = state.lock().map_err(|e| e.to_string())?;
+    next_issue_number(&conn, series_id).map_err(|e| format!("db query error: {}", e))
 }

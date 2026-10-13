@@ -17,6 +17,7 @@ pub fn handler<R: tauri::Runtime>() -> impl Fn(tauri::ipc::Invoke<R>) -> bool + 
         entry::api_create_entry,
         entry::api_update_entry,
         entry::api_delete_entry,
+        entry::api_retrieve_next_issue_number,
     ]
 }
 
