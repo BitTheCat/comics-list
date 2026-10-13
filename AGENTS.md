@@ -97,7 +97,7 @@ Rows are ordered by priority within each status.
 | 4 | Split create/update payloads | ✅ | API | `id` is required on update (removed `Option<i64>`). |
 | 5 | DB managed state | ✅ | Rust | Open the DB connection once at startup; `app.manage(Mutex<Connection>)`; commands take `State<'_, Mutex<Connection>>` instead of `init_db(&app)`. |
 | 6 | Entry year range | ✅ | UI | Limit the publication-year select to the series' year range (a series started in 2000 can't have entries with an earlier year). |
-| 7 | Next issue number | ⏩ | UI | When adding an entry, prefill the next number (1 if it's the first, otherwise last + 1; if there are gaps, use the last). |
+| 7 | Next issue number | ✅ | UI | When adding an entry, prefill the next number (1 if it's the first, otherwise last + 1; if there are gaps, use the last). |
 | 8 | Empty title placeholder | ✅ | UI | Show `-` in the list when an entry title is empty. |
 | 9 | Multi-language | ⌛ | i18n | Complete i18n coverage (Italian/English); persist language choice in settings. |
 | 10 | Covers | ⌛ | Rust/UI | Store cover images on disk in the app data dir; generate thumbnails (Rust side); show in lists/details; optional hash-based dedup. |

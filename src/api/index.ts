@@ -93,17 +93,22 @@ export const api = {
     }
     return mock.getEntriesPaginated(request.series_id, request);
   },
-  createEntry: (payload: any) => {
+  createEntry: async (payload: any) => {
     if (isTauriRuntime()) return invokeTauri('api_create_entry', { payload });
     return import('../mocks/api_entries').then((m) => m.createEntry(payload));
   },
-  updateEntry: (payload: any) => {
+  updateEntry: async (payload: any) => {
     if (isTauriRuntime()) return invokeTauri('api_update_entry', { payload });
     return import('../mocks/api_entries').then((m) => m.updateEntry(payload));
   },
-  deleteEntry: (id: number) => {
+  deleteEntry: async (id: number) => {
     if (isTauriRuntime()) return invokeTauri('api_delete_entry', { id });
     return import('../mocks/api_entries').then((m) => m.deleteEntry(id));
   },
+  nextIssueNumber: async (series_id: number): Promise<string> => {
+    if (isTauriRuntime()) return invokeTauri('api_retrieve_next_issue_number', { seriesId: series_id });
+    return '1';
+  },
+  
 };
 

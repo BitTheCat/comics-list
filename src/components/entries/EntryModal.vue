@@ -94,6 +94,7 @@ const props = withDefaults(defineProps<{
 });
 
 const modelValue = toRef(props, 'modelValue');
+const nextIssueNumber = ref<string>('1');
 
 const emit = defineEmits<{
   (e: 'created'): void;
@@ -114,7 +115,7 @@ type EntryForm = {
 
 const createForm = (entry?: Entry | null): EntryForm => ({
   id: entry?.id,
-  issue_number: entry?.issue_number ?? '0',
+  issue_number: entry?.issue_number ?? nextIssueNumber.value,
   series_id: entry?.series_id ?? props.seriesId,
   title: entry?.title ?? '',
   pub_year: entry?.pub_year ?? null,
@@ -127,10 +128,6 @@ const createForm = (entry?: Entry | null): EntryForm => ({
 const form = ref<EntryForm>(createForm(props.entry));
 const { showToast } = useToast();
 const { t, locale } = useI18n();
-
-watch(modelValue, (val) => {
-  if (val) form.value = createForm(props.entry);
-});
 
 const parseMonth = (value: string | null): number | null => {
   if (!value) return null;
@@ -199,4 +196,10 @@ const createOrUpdate = async () => {
     await create();
   }
 };
+
+watch(modelValue, async (val) => {
+  if (!val) return;
+  nextIssueNumber.value = await api.nextIssueNumber(props.seriesId);
+  form.value = createForm(props.entry);
+});
 </script>
