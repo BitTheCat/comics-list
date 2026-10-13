@@ -99,8 +99,10 @@ Rows are ordered by priority within each status.
 | 6 | Entry year range | ✅ | UI | Limit the publication-year select to the series' year range (a series started in 2000 can't have entries with an earlier year). |
 | 7 | Next issue number | ✅ | UI | When adding an entry, prefill the next number (1 if it's the first, otherwise last + 1; if there are gaps, use the last). |
 | 8 | Empty title placeholder | ✅ | UI | Show `-` in the list when an entry title is empty. |
-| 9 | Multi-language | ⌛ | i18n | Complete i18n coverage (Italian/English); persist language choice in settings. |
-| 10 | Covers | ⌛ | Rust/UI | Store cover images on disk in the app data dir; generate thumbnails (Rust side); show in lists/details; optional hash-based dedup. |
-| 11 | Import/export | ⌛ | API/UI | Import/export of the collection (JSON/CSV) including cover files. |
-| 12 | Settings persistence | ⌛ | UI | Persist theme, language, DB path info. |
-| 13 | Auto-update | ⌛ | Rust/UI | Check for a new version at startup and download/install it. Use `tauri-plugin-updater` + `tauri-plugin-process`; requires a signed manifest (minisign keypair) and a release endpoint (e.g. GitHub Releases serving `latest.json`); surface in Settings; keep the version in sync across `tauri.conf.json` / `Cargo.toml` / `package.json`. |
+| 9 | Config file & settings | ⏩ | Rust/UI | TOML config next to the exe, created on startup with defaults; app is portable by default. Holds `portable`, `db_path`, `covers_dir`, theme, language. Commit `config.example.toml`, gitignore the local one. |
+| 10 | Covers | ⌛ | Rust/UI | Store cover images on disk, respecting the config (`portable`/`covers_dir`); generate thumbnails (Rust side); show in lists/details; optional hash-based dedup. |
+| 11 | Storage location & move | ⌛ | Rust/UI | Settings UI to change the DB/covers location (requires restart); offer to move the existing DB + covers to the new location. |
+| 12 | Multi-language | ⌛ | i18n | Complete i18n coverage (Italian/English); persist language choice in the config. |
+| 13 | Import/export | ⌛ | API/UI | Import/export of the collection (JSON/CSV) including cover files. |
+| 14 | Auto-update | ⌛ | Rust/UI | Check for a new version at startup and download/install it. Use `tauri-plugin-updater` + `tauri-plugin-process`; requires a signed manifest (minisign keypair) and a release endpoint (e.g. GitHub Releases serving `latest.json`); surface in Settings; keep the version in sync across `tauri.conf.json` / `Cargo.toml` / `package.json`. |
+| 15 | Stretch features | ⌛ | - | Metadata fetch (e.g. ComicVine) for cover suggestions on demand; sync. |
