@@ -1,6 +1,6 @@
 <template>
-  <div v-if="modelValue" class="modal modal-open" @click="close">
-    <div class="modal-box text-base-content" @click.stop>
+  <div v-if="modelValue" class="modal modal-open" @mousedown.self="close">
+    <div class="modal-box text-base-content">
       <h3 v-if="title" class="text-lg font-bold">{{ title }}</h3>
 
       <slot />
