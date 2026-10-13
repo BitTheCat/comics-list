@@ -29,6 +29,10 @@
                 @previous="fetchEntries"
                 @next="fetchEntries"
             >
+                <template #title="{ item }">
+                    {{ item.title ? item.title : '-' }}
+                </template>
+
                 <template #year="{ item }">
                     {{ formatPublication(item as Entry) }}
                 </template>

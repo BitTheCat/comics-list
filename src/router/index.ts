@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteLocationNormalized } from 'vue-router';
 import SeriesList from '../pages/SeriesList.vue';
-import EntriesList from '../pages/EntriesList.vue';
+import EntryList from '../pages/EntryList.vue';
 
 const routes = [
   { path: '/', redirect: '/series' },
@@ -9,7 +9,7 @@ const routes = [
   {
     path: '/series/:id',
     name: 'series-detail',
-    component: EntriesList,
+    component: EntryList,
     props: (route: RouteLocationNormalized) => ({
       id: route.params.id,
       minYear: Number(route.query.min_year) || 1950,
