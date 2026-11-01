@@ -1,14 +1,10 @@
 import { ref } from 'vue';
+import { api } from '../api';
 
 export type Theme = 'light' | 'dark';
 
-const STORAGE_KEY = 'comics-list.theme';
-
 const resolveInitialTheme = (): Theme => {
   if (typeof window === 'undefined') return 'light';
-
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === 'light' || stored === 'dark') return stored;
 
   const fromAttribute = document.documentElement.getAttribute('data-theme');
   if (fromAttribute === 'light' || fromAttribute === 'dark') return fromAttribute;
@@ -18,11 +14,11 @@ const resolveInitialTheme = (): Theme => {
 
 const theme = ref<Theme>(resolveInitialTheme());
 
+// Applies the theme without persisting it (used at startup, from the config).
 const applyTheme = (value: Theme) => {
   theme.value = value;
   if (typeof window !== 'undefined') {
     document.documentElement.setAttribute('data-theme', value);
-    window.localStorage.setItem(STORAGE_KEY, value);
   }
 };
 
@@ -31,7 +27,9 @@ if (typeof window !== 'undefined') {
 }
 
 const toggleTheme = () => {
-  applyTheme(theme.value === 'dark' ? 'light' : 'dark');
+  const next: Theme = theme.value === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  api.updateConfig({ theme: next }).catch((error) => console.error(error));
 };
 
 export const useTheme = () => ({

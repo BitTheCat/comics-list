@@ -1,0 +1,13 @@
+# Comics List configuration.
+# The app creates `config.toml` next to the executable on first start.
+# Copy this file to `config.toml` only if you want to pre-configure it.
+
+# Default storage mode: true = next to the executable, false = app data directory.
+portable = true
+
+# Explicit paths (take precedence over `portable`). Leave unset for defaults.
+# db_path = "D:/comics/comics-list.db"
+# covers_dir = "D:/comics/covers"
+
+# theme = "dark"     # "light" | "dark"
+# language = "it"    # "it" | "en"

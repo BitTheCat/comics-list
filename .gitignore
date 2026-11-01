@@ -10,3 +10,4 @@ src-tauri/Cargo.lock
 *.log
 src-tauri/gen/
 AGENTS.local.md
+config.toml

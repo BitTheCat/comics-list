@@ -1,3 +1,4 @@
+export * from './config';
 export * from './entry';
 export * from './pagination';
 export * from './publisher';

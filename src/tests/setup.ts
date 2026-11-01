@@ -1,8 +1,5 @@
 // Test setup file for Vitest (happy-dom environment)
 // Keep tests deterministic by forcing English locale.
+import { useI18n } from '../i18n/useI18n';
 
-if (typeof window !== 'undefined') {
-  window.localStorage.setItem('comics-list.locale', 'en');
-}
-
-export {};
+useI18n().applyLocale('en');
