@@ -16,9 +16,10 @@ pub fn api_update_config(
 ) -> Result<AppConfig, String> {
     let mut config = state.lock().map_err(|e| e.to_string())?;
 
-    // Update a copy first: the in-memory state changes only if the file is saved.
+    // Update a copy first: the in-memory state changes only if the update is
+    // valid and the file is saved.
     let mut updated = config.clone();
-    updated.apply(payload);
+    updated.apply(payload)?;
     save_config(&config_path()?, &updated).map_err(|e| format!("config save error: {}", e))?;
 
     *config = updated;

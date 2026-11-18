@@ -69,6 +69,7 @@
           :label="t('settings_covers_dir')"
           :placeholder="t('settings_path_placeholder')"
         />
+        <p class="text-xs text-muted">{{ t('settings_path_hint') }}</p>
         <p class="text-xs text-muted">{{ t('settings_restart_notice') }}</p>
       </div>
     </Modal>
