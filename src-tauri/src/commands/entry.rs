@@ -10,8 +10,8 @@ use crate::models::pagination::PaginationResponse;
 
 #[tauri::command]
 pub fn api_create_entry(
-    state: tauri::State<'_, Mutex<Connection>>, 
-    payload: CreateEntryPayload
+    state: tauri::State<'_, Mutex<Connection>>,
+    payload: CreateEntryPayload,
 ) -> Result<i64, String> {
     let conn = state.lock().map_err(|e| e.to_string())?;
     let now = Utc::now().to_rfc3339();
@@ -35,7 +35,7 @@ pub fn api_create_entry(
 
 #[tauri::command]
 pub fn api_list_entries_paginated(
-    state: tauri::State<'_, Mutex<Connection>>, 
+    state: tauri::State<'_, Mutex<Connection>>,
     request: ListEntriesRequest,
 ) -> Result<PaginationResponse<EntryRow>, String> {
     let conn = state.lock().map_err(|e| e.to_string())?;
@@ -52,8 +52,8 @@ pub fn api_list_entries_paginated(
 
 #[tauri::command]
 pub fn api_update_entry(
-    state: tauri::State<'_, Mutex<Connection>>, 
-    payload: UpdateEntryPayload
+    state: tauri::State<'_, Mutex<Connection>>,
+    payload: UpdateEntryPayload,
 ) -> Result<i64, String> {
     let conn = state.lock().map_err(|e| e.to_string())?;
     let now = Utc::now().to_rfc3339();
@@ -77,10 +77,7 @@ pub fn api_update_entry(
 }
 
 #[tauri::command]
-pub fn api_delete_entry(
-    state: tauri::State<'_, Mutex<Connection>>, 
-    id: i64
-) -> Result<(), String> {
+pub fn api_delete_entry(state: tauri::State<'_, Mutex<Connection>>, id: i64) -> Result<(), String> {
     let conn = state.lock().map_err(|e| e.to_string())?;
     delete_entry(&conn, id).map_err(|e| format!("db delete error: {}", e))?;
     Ok(())

@@ -4,6 +4,7 @@ export const messages = {
     app_subtitle: 'by BitTheCat',
 
     common_close: 'Chiudi',
+    common_save: 'Salva',
     common_cancel: 'Annulla',
     common_create: 'Crea',
     common_update: 'Aggiorna',
@@ -15,6 +16,13 @@ export const messages = {
     settings_theme: 'Tema',
     settings_theme_light: 'Chiaro',
     settings_theme_dark: 'Scuro',
+    settings_db_path: 'Percorso database',
+    settings_covers_dir: 'Cartella cover',
+    settings_path_placeholder: 'Predefinito (accanto all\'eseguibile)',
+    settings_path_hint: 'Usa percorsi assoluti locali. Il database deve essere un file .db.',
+    settings_restart_notice: 'Le modifiche ai percorsi richiedono il riavvio dell\'app.',
+    settings_toast_save_success: 'Impostazioni salvate',
+    settings_toast_save_error: 'Impossibile salvare le impostazioni',
 
     button_view: 'Apri',
     button_edit: 'Modifica',
@@ -101,6 +109,7 @@ export const messages = {
     app_subtitle: 'by BitTheCat',
 
     common_close: 'Close',
+    common_save: 'Save',
     common_cancel: 'Cancel',
     common_create: 'Create',
     common_update: 'Update',
@@ -112,6 +121,13 @@ export const messages = {
     settings_theme: 'Theme',
     settings_theme_light: 'Light',
     settings_theme_dark: 'Dark',
+    settings_db_path: 'Database path',
+    settings_covers_dir: 'Covers folder',
+    settings_path_placeholder: 'Default (next to the executable)',
+    settings_path_hint: 'Use absolute local paths. The database must be a .db file.',
+    settings_restart_notice: 'Path changes require restarting the app.',
+    settings_toast_save_success: 'Settings saved',
+    settings_toast_save_error: 'Failed to save settings',
 
     button_view: 'View',
     button_edit: 'Edit',

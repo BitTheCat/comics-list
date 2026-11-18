@@ -1,5 +1,5 @@
-use std::sync::Mutex;
 use rusqlite::Connection;
+use std::sync::Mutex;
 
 use crate::db::{create_publisher, list_publishers, PublisherRow};
 use crate::models::publisher::CreatePublisherPayload;

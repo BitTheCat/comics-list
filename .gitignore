@@ -3,10 +3,11 @@ dist
 target
 **/*.db
 src-tauri/target
-src-tauri/Cargo.lock
+
 .env
 .DS_Store
 .vscode
 *.log
 src-tauri/gen/
 AGENTS.local.md
+config.toml

@@ -1,10 +1,8 @@
 use chrono::Utc;
-use std::sync::Mutex;
 use rusqlite::Connection;
+use std::sync::Mutex;
 
-use crate::db::{
-    create_series, delete_series, list_series_paginated, update_series, SeriesRow,
-};
+use crate::db::{create_series, delete_series, list_series_paginated, update_series, SeriesRow};
 use crate::models::pagination::{PaginationRequest, PaginationResponse};
 use crate::models::series::{CreateSeriesPayload, UpdateSeriesPayload};
 
@@ -70,7 +68,7 @@ pub fn api_update_series(
 #[tauri::command]
 pub fn api_delete_series(
     state: tauri::State<'_, Mutex<Connection>>,
-    id: i64
+    id: i64,
 ) -> Result<(), String> {
     let conn = state.lock().map_err(|e| e.to_string())?;
     delete_series(&conn, id).map_err(|e| format!("db delete error: {}", e))?;
